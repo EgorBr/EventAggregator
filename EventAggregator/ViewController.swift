@@ -7,12 +7,17 @@
 //
 
 import UIKit
+import SwiftyJSON
+import Alamofire
+import RealmSwift
 
-class ViewController: UIViewController {
+class TableCityViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        print(Realm.Configuration.defaultConfiguration.fileURL)
+        ManageEventTimepad().loadEvent()
     }
 
     override func didReceiveMemoryWarning() {

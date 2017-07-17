@@ -60,6 +60,9 @@ class ManageEventTimepad {
                                 }
                             }
                         }
+//                        try! realm.write {
+//                            realm.add(insCity, update: true)
+//                        }
                         try! realm.commitWrite()
                     case .failure(let error):
                         print(error)
@@ -100,8 +103,10 @@ class ManageEventTimepad {
                         }
                     }
                 }
-                print(arrayDatabaseCity)
-                return (loadEvent(city: arrayDatabaseCity, country: "Россия"))
+                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+3, execute: {
+                    print(arrayDatabaseCity)
+                    return (loadEvent(city: arrayDatabaseCity, country: "Россия"))
+                    })
             case .failure(let error):
                 print(error)
             }
