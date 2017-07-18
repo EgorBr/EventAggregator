@@ -90,7 +90,7 @@ class ManageEventTimepad {
                             if arrayDatabaseCity.contains(insCity.name) {}
                             else {
                                 arrayDatabaseCity.append(insCity.name)
-                                print("ADD", insCity.name)
+//                                print("ADD", insCity.name)
                             }
                             
                             try! realm.write {
@@ -104,7 +104,6 @@ class ManageEventTimepad {
                     }
                 }
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now()+3, execute: {
-                    print(arrayDatabaseCity)
                     return (loadEvent(city: arrayDatabaseCity, country: "Россия"))
                     })
             case .failure(let error):
