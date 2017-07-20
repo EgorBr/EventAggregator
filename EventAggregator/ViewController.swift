@@ -18,19 +18,20 @@ class TableCityViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         print(Realm.Configuration.defaultConfiguration.fileURL)
-        ManageEventTimepad().loadEvent()
+//        ManageEventTimepad().loadEvent()
     
     }
     
     
-    
+    // Количество секций
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
+    //Колчество показываемых строк в этой секции
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return loadDB.loadDBCityName().count
     }
-    
+    //Эти строки данными
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cityCell = tableView.dequeueReusableCell(withIdentifier: "cityCell", for: indexPath)
         cityCell.textLabel?.text = loadDB.loadDBCityName()[indexPath.row]
@@ -43,6 +44,14 @@ class TableCityViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "event" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let destinationVC = segue.destination as! EventCollectionViewController
+                destinationVC.city = loadDB.loadDBCityName()[indexPath.row]
+            }
+        }
+    }
 
 }
 

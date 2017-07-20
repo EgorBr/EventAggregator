@@ -54,6 +54,10 @@ class ManageEventTimepad {
                                     insEvent.full_event_description = DecodeHTML().decodehtmltotxt(htmltxt: json["description_html"].stringValue)
                                     insEvent.address = DecodeHTML().decodehtmltotxt(htmltxt: json["location"]["address"].stringValue)
                                     insCity.eventList.append(insEvent)
+//                                    try! realm.write {
+//                                        insCity.eventList.append(insEvent)
+//                                        realm.add(insCity, update: true)
+//                                    }
                                     
                                 case .failure(let error):
                                     print(error)

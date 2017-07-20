@@ -8,9 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		6CEDC05DCC40ABAD867456F6 /* Pods_EventAggregator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 017B0F8B1AA3DB5B3741EAA0 /* Pods_EventAggregator.framework */; };
+		F443BF2D1F2142DA007811FA /* EventCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F443BF2C1F2142DA007811FA /* EventCollectionViewController.swift */; };
 		F45524031F1E891600AE1318 /* LoadDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45524021F1E891600AE1318 /* LoadDB.swift */; };
-		F45524051F1EAF6000AE1318 /* EventTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45524041F1EAF6000AE1318 /* EventTableViewController.swift */; };
-		F45524071F1EB22100AE1318 /* DetailsEventUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45524061F1EB22100AE1318 /* DetailsEventUIView.swift */; };
 		F475B5D91F1D3AAD006ACA85 /* TypeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F475B5D81F1D3AAD006ACA85 /* TypeEvent.swift */; };
 		F475B5DB1F1D3ACC006ACA85 /* CityEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F475B5DA1F1D3ACC006ACA85 /* CityEvent.swift */; };
 		F475B5DD1F1D3AE1006ACA85 /* DecodeHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = F475B5DC1F1D3AE1006ACA85 /* DecodeHTML.swift */; };
@@ -28,9 +27,8 @@
 		017B0F8B1AA3DB5B3741EAA0 /* Pods_EventAggregator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EventAggregator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		387FFE59891DF1C8A1F2C9D6 /* Pods-EventAggregator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EventAggregator.debug.xcconfig"; path = "Pods/Target Support Files/Pods-EventAggregator/Pods-EventAggregator.debug.xcconfig"; sourceTree = "<group>"; };
 		481FD2D7A4D654D36D194888 /* Pods-EventAggregator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EventAggregator.release.xcconfig"; path = "Pods/Target Support Files/Pods-EventAggregator/Pods-EventAggregator.release.xcconfig"; sourceTree = "<group>"; };
+		F443BF2C1F2142DA007811FA /* EventCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCollectionViewController.swift; sourceTree = "<group>"; };
 		F45524021F1E891600AE1318 /* LoadDB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadDB.swift; sourceTree = "<group>"; };
-		F45524041F1EAF6000AE1318 /* EventTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventTableViewController.swift; sourceTree = "<group>"; };
-		F45524061F1EB22100AE1318 /* DetailsEventUIView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailsEventUIView.swift; sourceTree = "<group>"; };
 		F475B5D81F1D3AAD006ACA85 /* TypeEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeEvent.swift; sourceTree = "<group>"; };
 		F475B5DA1F1D3ACC006ACA85 /* CityEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CityEvent.swift; sourceTree = "<group>"; };
 		F475B5DC1F1D3AE1006ACA85 /* DecodeHTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecodeHTML.swift; sourceTree = "<group>"; };
@@ -106,8 +104,7 @@
 				F475B5DA1F1D3ACC006ACA85 /* CityEvent.swift */,
 				F475B5DC1F1D3AE1006ACA85 /* DecodeHTML.swift */,
 				F476CBCC1F1D38F7007349F5 /* Main.storyboard */,
-				F45524061F1EB22100AE1318 /* DetailsEventUIView.swift */,
-				F45524041F1EAF6000AE1318 /* EventTableViewController.swift */,
+				F443BF2C1F2142DA007811FA /* EventCollectionViewController.swift */,
 				F476CBCF1F1D38F7007349F5 /* Assets.xcassets */,
 				F476CBD11F1D38F7007349F5 /* LaunchScreen.storyboard */,
 				F476CBD41F1D38F7007349F5 /* Info.plist */,
@@ -239,13 +236,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				F475B5D91F1D3AAD006ACA85 /* TypeEvent.swift in Sources */,
-				F45524071F1EB22100AE1318 /* DetailsEventUIView.swift in Sources */,
 				F45524031F1E891600AE1318 /* LoadDB.swift in Sources */,
 				F476CBCB1F1D38F7007349F5 /* ViewController.swift in Sources */,
 				F476CBDF1F1D3A3B007349F5 /* Event.swift in Sources */,
-				F45524051F1EAF6000AE1318 /* EventTableViewController.swift in Sources */,
 				F475B5DB1F1D3ACC006ACA85 /* CityEvent.swift in Sources */,
 				F475B5DD1F1D3AE1006ACA85 /* DecodeHTML.swift in Sources */,
+				F443BF2D1F2142DA007811FA /* EventCollectionViewController.swift in Sources */,
 				F476CBE31F1D3A70007349F5 /* ManageEventTimepad.swift in Sources */,
 				F476CBE11F1D3A54007349F5 /* EventTickets.swift in Sources */,
 				F476CBC91F1D38F7007349F5 /* AppDelegate.swift in Sources */,
