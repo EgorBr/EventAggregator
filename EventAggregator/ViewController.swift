@@ -21,6 +21,7 @@ class TableCityViewController: UITableViewController {
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
         ManageEventTimepad().loadJSON()
+        
 //        ManageEventKudaGO().loadcitykudago()
         
     }
