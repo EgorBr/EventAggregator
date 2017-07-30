@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 
 class Event: Object {
-    dynamic var timepad_id: Int = 0
+    dynamic var timepad_id: String = ""
     dynamic var name: String = ""
     dynamic var creat_org: String = ""
     dynamic var start_time: String = ""

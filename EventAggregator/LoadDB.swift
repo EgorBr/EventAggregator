@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 
 class LoadDB {
-    func loadDBCityName() -> [String]{
+    func CityName() -> [String]{
         let realm = try! Realm()
         var arrCityName: [String] = []
         let valueCityName = realm.objects(CityEvent.self)
@@ -22,16 +22,15 @@ class LoadDB {
         
     }
     //загружаем эвенты
-    func loadDBEvent() {
-        
-    }
-    //Загружаем детальное описание эвентов
-    func loadDBDetailsEvent(name: String) -> Results<CityEvent> {
+    func Event(name: String) -> Results<CityEvent> {
         let realm = try! Realm()
         let details = realm.objects(CityEvent.self).filter("name BEGINSWITH %@", name)
         return details
     }
     
+    func eventdescription() {
+        
+    }
     
 //    let startTimeString = "2015-06-26T00:10:00+01:00"
 //    

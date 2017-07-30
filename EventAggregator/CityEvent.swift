@@ -11,7 +11,7 @@ import RealmSwift
 
 class CityEvent: Object {
     dynamic var name: String = ""
-    dynamic var country: String = ""
+    dynamic var slug: String = ""
     var eventList = List<Event>()
     
     override static func primaryKey() -> String? {
