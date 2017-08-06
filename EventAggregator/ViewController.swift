@@ -13,7 +13,9 @@ import RealmSwift
 
 class TableCityViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
-    let semaphore = DispatchSemaphore(value: 0)
+    let realm = try! Realm()
+    var notificationToken: NotificationToken? = nil
+//    let semaphore = DispatchSemaphore(value: 0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,11 +23,19 @@ class TableCityViewController: UITableViewController {
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
         ManageEventTimepad().loadJSON()
+        tableView.reloadData()
         
 //        ManageEventKudaGO().loadcitykudago()
         
+    
+    
+    
+    notificationToken = realm.addNotificationBlock {notification, realm in
+        self.tableView.reloadData()
     }
-
+        
+        
+    }
     
     
     // Количество секций
@@ -56,6 +66,10 @@ class TableCityViewController: UITableViewController {
                 destinationVC.city = loadDB.CityName()[indexPath.row]
             }
         }
+    }
+    
+    deinit {
+        notificationToken?.stop()
     }
 
 }

@@ -27,7 +27,7 @@ class ManageEventTimepad {
         
         //Первый запрос для полчения ID мероприятий чтобы получил города
         requestGroup.enter()
-        Alamofire.request(urlTimepadEvent+"&limit=5", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
+        Alamofire.request(urlTimepadEvent+"&limit=100", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
@@ -51,15 +51,15 @@ class ManageEventTimepad {
                             let insTypeEvent = TypeEvent()
                             insCity.name = json["location"]["city"].stringValue
                             insTypeEvent.name = json["categories"][0]["name"].stringValue
-                            print("1: \(Thread.current)")
+            print("1: \(Thread.current)")
                             if arrayDatabaseCity.contains(insCity.name) {}
                             else {
                                 arrayDatabaseCity.append(insCity.name)
-                                print("ADD \(Thread.current)", insCity.name)
                             }
+                            
                             let realm = try! Realm()
                             try! realm.write {
-                                print("2: \(Thread.current)")
+            print("2: \(Thread.current)")
                                 realm.add(insTypeEvent, update: true)
                                 realm.add(insCity, update: true)
                             }
@@ -67,6 +67,7 @@ class ManageEventTimepad {
                         case .failure(let error):
                             print(error)
                         }
+                        
                     }
                 }
             }
