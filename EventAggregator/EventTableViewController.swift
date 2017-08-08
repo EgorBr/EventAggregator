@@ -23,8 +23,6 @@ class EventTableViewController: UITableViewController {
         self.tableView.estimatedRowHeight = 15
         self.tableView.rowHeight = UITableViewAutomaticDimension
         
-        print(city)
-        
         let eventDB = loadDB.Event(name: city)
         for value in eventDB[0].eventList {
             nameEvent.append(value.name)

@@ -13,28 +13,35 @@ import RealmSwift
 
 class TableCityViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
+    
     let realm = try! Realm()
-    var notificationToken: NotificationToken? = nil
-//    let semaphore = DispatchSemaphore(value: 0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(cityname), name: NSNotification.Name(rawValue: "refreshCity"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(writeDBEvent), name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
+        
         ManageEventTimepad().loadJSON()
-        tableView.reloadData()
         
 //        ManageEventKudaGO().loadcitykudago()
-        
-    
-    
-    
-    notificationToken = realm.addNotificationBlock {notification, realm in
-        self.tableView.reloadData()
     }
-        
-        
+    
+    func cityname() {
+        ManageEventTimepad().loadDBcity()
+        DispatchQueue.main.sync {
+            self.tableView.reloadData()
+//            print("refresh: \(Thread.current)")
+        }
+    }
+    func writeDBEvent(cityName: [String]) {
+        print("1")
+//        let realm = try! Realm()
+//        try! realm.write() {
+//            realm.add(cityName, update: true)
+//        }
     }
     
     
@@ -68,9 +75,9 @@ class TableCityViewController: UITableViewController {
         }
     }
     
-    deinit {
-        notificationToken?.stop()
-    }
+//    deinit {
+//        notificationToken?.stop()
+//    }
 
 }
 

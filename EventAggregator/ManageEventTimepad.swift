@@ -18,22 +18,26 @@ class ManageEventTimepad {
     
     let requestGroup = DispatchGroup()
     let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
-    var results = [String: String]()
+//    let barrierQueue = DispatchQueue(label: "concurrent_queue", flags: .barrier)
     
-    func loadJSON() -> [String]{
+    var results = [String: String]()
+    var arrayDatabaseCity: [String] = []
+    var tmp: [String] = []
+    
+    func loadJSON(){
         
-        var idforcity: [String] = []
-        var arrayDatabaseCity: [String] = []
+        var idForCity: [String] = []
+        
         
         //Первый запрос для полчения ID мероприятий чтобы получил города
         requestGroup.enter()
-        Alamofire.request(urlTimepadEvent+"&limit=100", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
+        Alamofire.request(urlTimepadEvent+"&limit=15", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
                 for (_, subJSON) in json["values"] {
                     let id = subJSON["id"].stringValue
-                    idforcity.append(id)
+                    idForCity.append(id)
                 }
                 
             case .failure(let error):
@@ -42,7 +46,7 @@ class ManageEventTimepad {
             
             // По полученным ID получаем название городов где будут проходить мероприятия
             if response.result.isSuccess {
-                for value in idforcity {
+                for (index, value) in idForCity.enumerated() {
                     Alamofire.request(self.urlEvent+value, method: .get).validate().responseJSON(queue: self.concurrentQueue) { response in
                         switch response.result {
                         case .success(let value):
@@ -51,29 +55,83 @@ class ManageEventTimepad {
                             let insTypeEvent = TypeEvent()
                             insCity.name = json["location"]["city"].stringValue
                             insTypeEvent.name = json["categories"][0]["name"].stringValue
-            print("1: \(Thread.current)")
-                            if arrayDatabaseCity.contains(insCity.name) {}
-                            else {
-                                arrayDatabaseCity.append(insCity.name)
-                            }
-                            
                             let realm = try! Realm()
                             try! realm.write {
-            print("2: \(Thread.current)")
                                 realm.add(insTypeEvent, update: true)
                                 realm.add(insCity, update: true)
                             }
                             
+//                            print(index)
+                            if idForCity.count == index+1 {
+//                                print("Notis")
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refreshCity"), object: nil)
+                            }
+//                            
                         case .failure(let error):
                             print(error)
                         }
-                        
                     }
                 }
             }
             
             self.requestGroup.leave()
         }
-        return arrayDatabaseCity
+        return
+    }
+    
+    func loadDBcity()  {
+        let realm = try! Realm()
+        let data = realm.objects(CityEvent.self)
+        for nameCity in data {
+            arrayDatabaseCity.append(nameCity.name)
+        }
+        loadDetailsEvent()
+        tmp = []
+        return
+    }
+    
+    func loadDetailsEvent() {
+        for valueName in arrayDatabaseCity {
+            let decodName = valueName.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+            Alamofire.request(urlTimepadEvent+"&cities=\(decodName!)", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
+                switch response.result {
+                case .success(let value):
+                    let json = JSON(value)
+                    let cityName = CityEvent()
+                    cityName.name = valueName
+                    for (index, subJSON) in json["values"] {
+                        Alamofire.request(self.urlEvent+subJSON["id"].stringValue, method: .get).validate().responseJSON(queue: self.concurrentQueue) { response in
+                            switch response.result {
+                            case .success(let value):
+                                let json = JSON(value)
+                                let cityEvent = Event()
+                                cityEvent.timepad_id = json["id"].stringValue
+                                cityEvent.name = Decoder().decodehtmltotxt(htmltxt: json["name"].stringValue)
+                                cityEvent.creat_org = json["organization"]["name"].stringValue
+                                cityEvent.start_time = json["starts_at"].stringValue
+                                cityEvent.end_time = json["ends_at"].stringValue
+                                cityEvent.event_description = Decoder().decodehtmltotxt(htmltxt: json["description_short"].stringValue)
+                                cityEvent.img = json["poster_image"]["default_url"].stringValue
+                                cityEvent.full_event_description = Decoder().decodehtmltotxt(htmltxt: json["description_html"].stringValue)
+                                cityEvent.address = Decoder().decodehtmltotxt(htmltxt: json["location"]["address"].stringValue)
+                                
+//                                print(index)
+                                cityName.eventList.append(cityEvent)
+//                                if index+1 == 10 {
+//                                    print(cityName)
+//                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
+//                                }
+                            case .failure(let error):
+                                print(error)
+                            }
+                        }
+                    }
+                    
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        }
+        
     }
 }

@@ -11,10 +11,18 @@ import UIKit
 class DetailsTableViewController: UITableViewController {
     
     var idEvent: String = ""
+    var event: [String] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+//        self.tableView.estimatedRowHeight = 15
+//        self.tableView.rowHeight = UITableViewAutomaticDimension
+        
+//        let event = loadDB.eventDescription(name: idEvent)
+//        for value in event {
+//            event.append(value.name)
+//        }
         print(idEvent)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -44,7 +52,14 @@ class DetailsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath)
 
-        // Configure the cell...
+//        let labelName: UILabel = detailsCell.viewWithTag(1) as! UILabel
+//        labelName.text = self.Event[indexPath.row]
+        
+//        let labelDesc: UILabel = eventCell.viewWithTag(2) as! UILabel
+//        labelDesc.text = self.eventDescription[indexPath.row]
+//        
+//        let labelStart: UILabel = eventCell.viewWithTag(3) as! UILabel
+//        labelStart.text = Decoder().dateformatter(date: self.startEventTime[indexPath.row])
 
         return detailsCell
     }
