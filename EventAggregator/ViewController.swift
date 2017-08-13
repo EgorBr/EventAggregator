@@ -13,8 +13,9 @@ import RealmSwift
 
 class TableCityViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
+    let serialQueue = DispatchQueue(label: "serial_queue")
     
-    let realm = try! Realm()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +23,7 @@ class TableCityViewController: UITableViewController {
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
         NotificationCenter.default.addObserver(self, selector: #selector(cityname), name: NSNotification.Name(rawValue: "refreshCity"), object: nil)
-//        NotificationCenter.default.addObserver(self, selector: #selector(writeDBEvent), name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(writeDBEvent), name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
         
         ManageEventTimepad().loadJSON()
         
@@ -33,15 +34,23 @@ class TableCityViewController: UITableViewController {
         ManageEventTimepad().loadDBcity()
         DispatchQueue.main.sync {
             self.tableView.reloadData()
-//            print("refresh: \(Thread.current)")
+            
         }
     }
-    func writeDBEvent(cityName: [String]) {
-        print("1")
-//        let realm = try! Realm()
-//        try! realm.write() {
-//            realm.add(cityName, update: true)
+    
+    func writeDBEvent(_ event: Notification) {
+//        print("REALM 2: \(Thread.current)")
+        let notis = event.object as! Object
+//        serialQueue.async (qos: .default){
+        autoreleasepool { () -> () in
+            let realm = try! Realm()
+            realm.beginWrite()
+                print("INSERT: \(Thread.current)")
+                realm.add(notis, update: true)
+            try! realm.commitWrite()
+        }
 //        }
+        
     }
     
     

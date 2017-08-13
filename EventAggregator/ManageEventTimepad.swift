@@ -18,11 +18,12 @@ class ManageEventTimepad {
     
     let requestGroup = DispatchGroup()
     let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
-//    let barrierQueue = DispatchQueue(label: "concurrent_queue", flags: .barrier)
+    let serialQueue = DispatchQueue(label: "serial_queue")
     
     var results = [String: String]()
     var arrayDatabaseCity: [String] = []
     var tmp: [String] = []
+    
     
     func loadJSON(){
         
@@ -31,7 +32,7 @@ class ManageEventTimepad {
         
         //Первый запрос для полчения ID мероприятий чтобы получил города
         requestGroup.enter()
-        Alamofire.request(urlTimepadEvent+"&limit=15", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
+        Alamofire.request(urlTimepadEvent+"&limit=1", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
@@ -93,14 +94,15 @@ class ManageEventTimepad {
     func loadDetailsEvent() {
         for valueName in arrayDatabaseCity {
             let decodName = valueName.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
-            Alamofire.request(urlTimepadEvent+"&cities=\(decodName!)", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
+            Alamofire.request(urlTimepadEvent+"&cities=\(decodName!)", method: .get).validate().responseJSON(queue: serialQueue) { response in
                 switch response.result {
                 case .success(let value):
                     let json = JSON(value)
                     let cityName = CityEvent()
                     cityName.name = valueName
                     for (index, subJSON) in json["values"] {
-                        Alamofire.request(self.urlEvent+subJSON["id"].stringValue, method: .get).validate().responseJSON(queue: self.concurrentQueue) { response in
+                        print("INDEX:\(index)")
+                        Alamofire.request(self.urlEvent+subJSON["id"].stringValue, method: .get).validate().responseJSON(queue: self.serialQueue) { response in
                             switch response.result {
                             case .success(let value):
                                 let json = JSON(value)
@@ -114,13 +116,14 @@ class ManageEventTimepad {
                                 cityEvent.img = json["poster_image"]["default_url"].stringValue
                                 cityEvent.full_event_description = Decoder().decodehtmltotxt(htmltxt: json["description_html"].stringValue)
                                 cityEvent.address = Decoder().decodehtmltotxt(htmltxt: json["location"]["address"].stringValue)
-                                
-//                                print(index)
                                 cityName.eventList.append(cityEvent)
-//                                if index+1 == 10 {
-//                                    print(cityName)
-//                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
-//                                }
+                                
+                                
+                                if (cityName.eventList.count + 1) == 10 {
+                                    print("REALM 1: \(Thread.current) \(index)")
+                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "writeDBEvent"), object: cityName)
+                                    break
+                                }
                             case .failure(let error):
                                 print(error)
                             }

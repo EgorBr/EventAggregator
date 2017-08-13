@@ -34,22 +34,18 @@ class ManageEventKudaGO {
                 print(error)
             }
         }
+        loadDetailsKudaGO()
     }
     
-    func loaddetailskudago() {
+    func loadDetailsKudaGO() {
         let realm = try! Realm()
-        Alamofire.request(urlKudaGO+"locations/?lang=ru", method: .get).validate().responseJSON { response in
+        Alamofire.request(urlKudaGO+"events/?lang=ru&slug=msk", method: .get).validate().responseJSON { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
-                for (_, subJSON) in json[] {
-                    let insCity = CityEvent()
-                    insCity.name = subJSON["name"].stringValue
-                    insCity.slug = subJSON["slug"].stringValue
-                    try! realm.write {
-                        realm.add(insCity, update: true)
-                    }
-                }
+                
+                print(json)
+                
             case .failure(let error):
                 print(error)
             }
