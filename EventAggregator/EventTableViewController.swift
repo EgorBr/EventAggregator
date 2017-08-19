@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
+import RealmSwift
 
 class EventTableViewController: UITableViewController {
     
@@ -16,28 +19,47 @@ class EventTableViewController: UITableViewController {
     var startEventTime: [String] = []
     var id: [String] = []
     let loadDB: LoadDB = LoadDB()
+    let manageDate = ManageEventTimepad()
+//    let realm = try! Realm()
+//    var notificationToken: NotificationToken? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+//        NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: NSNotification.Name(rawValue: "refresh"), object: nil)
+        
         self.tableView.estimatedRowHeight = 15
         self.tableView.rowHeight = UITableViewAutomaticDimension
-        
+
         let eventDB = loadDB.Event(name: city)
+        
         for value in eventDB[0].eventList {
-            nameEvent.append(value.name)
-            eventDescription.append(value.event_description)
-            startEventTime.append(value.start_time)
-            id.append(value.timepad_id)
+            self.nameEvent.append(value.name)
+            self.eventDescription.append(value.event_description)
+            self.startEventTime.append(value.start_time)
+            self.id.append(value.timepad_id)
+            //                print(" jfdngjsngks")
         }
         
-
+//        notificationToken = realm.addNotificationBlock {notification, realm in
+//            
+//            self.tableView.reloadData()
+//        }
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    
     }
+    
+    func refreshData() {
+        DispatchQueue.main.sync {
+            self.tableView.reloadData()
+            print("reload")
+        }
+    }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -53,7 +75,7 @@ class EventTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return nameEvent.count
+        return id.count
     }
 
     

@@ -12,18 +12,31 @@ class DetailsTableViewController: UITableViewController {
     
     var idEvent: String = ""
     var event: [String] = []
+    let loadDB: LoadDB = LoadDB()
+    var name: String = ""
+    var details: String = ""
+    var fullDetails: String = ""
+    var start: String = ""
+    var end: String = ""
+    var org: String = ""
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        self.tableView.estimatedRowHeight = 15
-//        self.tableView.rowHeight = UITableViewAutomaticDimension
+        self.tableView.estimatedRowHeight = 150
+        self.tableView.rowHeight = UITableViewAutomaticDimension
         
-//        let event = loadDB.eventDescription(name: idEvent)
-//        for value in event {
-//            event.append(value.name)
-//        }
-        print(idEvent)
+        let event = loadDB.eventDescription(id: idEvent)
+        for value in event {
+            name = value.name
+            details = value.event_description
+            fullDetails = value.full_event_description
+            start = value.start_time
+            end = value.end_time
+            org = value.creat_org
+        }
+//        print(event)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -45,21 +58,27 @@ class DetailsTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 1
+        return loadDB.eventDescription(id: idEvent).count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath)
 
-//        let labelName: UILabel = detailsCell.viewWithTag(1) as! UILabel
-//        labelName.text = self.Event[indexPath.row]
+        let LabelNameDetails: UILabel = detailsCell.viewWithTag(1) as! UILabel
+        LabelNameDetails.text = self.name
         
-//        let labelDesc: UILabel = eventCell.viewWithTag(2) as! UILabel
-//        labelDesc.text = self.eventDescription[indexPath.row]
-//        
-//        let labelStart: UILabel = eventCell.viewWithTag(3) as! UILabel
-//        labelStart.text = Decoder().dateformatter(date: self.startEventTime[indexPath.row])
+        let LabelFullDetails: UILabel = detailsCell.viewWithTag(2) as! UILabel
+        LabelFullDetails.text = self.details+self.fullDetails
+//
+        let LabelStartDetails: UILabel = detailsCell.viewWithTag(3) as! UILabel
+        LabelStartDetails.text = Decoder().dateformatter(date: self.start)
+        
+        let LabelStopDetails: UILabel = detailsCell.viewWithTag(4) as! UILabel
+        LabelStopDetails.text = Decoder().dateformatter(date: self.end)
+        
+        let LabelOrgDetails: UILabel = detailsCell.viewWithTag(7) as! UILabel
+        LabelOrgDetails.text = self.org
 
         return detailsCell
     }

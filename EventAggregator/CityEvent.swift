@@ -12,7 +12,8 @@ import RealmSwift
 class CityEvent: Object {
     dynamic var name: String = ""
     dynamic var slug: String = ""
-    var eventList = List<Event>()
+    var eventList = List<EventTimepad>()
+    var kudagoList = List<EventKudaGO>()
     
     override static func primaryKey() -> String? {
         return "name"

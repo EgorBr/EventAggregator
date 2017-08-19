@@ -1,19 +1,19 @@
 //
-//  TypeEvent.swift
+//  EventKudaGo.swift
 //  EventAggregator
 //
-//  Created by Egor Bryzgalov on 12.07.17.
+//  Created by Egor Bryzgalov on 17.08.17.
 //  Copyright © 2017 Egor Bryzgalov. All rights reserved.
 //
 
 import Foundation
 import RealmSwift
 
-class TypeEvent: Object {
+class EventKudaGO: Object {
+    dynamic var kudago_id: String = ""
     dynamic var name: String = ""
-    var eventList = List<EventTimepad>()
-    
+
     override static func primaryKey() -> String? {
-        return "name"
+        return "kudago_id"
     }
 }

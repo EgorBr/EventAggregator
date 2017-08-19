@@ -29,9 +29,9 @@ class LoadDB {
         return details
     }
     
-//    func eventDescription(id: String) {
-//        let realm = try! Realm()
-//        let oneDetails = realm.object(Event.self)
-//        return oneDetails
-//    }
+    func eventDescription(id: String) -> Results<EventTimepad> {
+        let realm = try! Realm()
+        let oneEvent = realm.objects(EventTimepad.self).filter("timepad_id BEGINSWITH %@", id)
+        return oneEvent
+    }
 }

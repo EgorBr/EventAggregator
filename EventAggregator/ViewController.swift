@@ -5,7 +5,7 @@
 //  Created by Egor Bryzgalov on 17.07.17.
 //  Copyright © 2017 Egor Bryzgalov. All rights reserved.
 //
-
+import Foundation
 import UIKit
 import SwiftyJSON
 import Alamofire
@@ -14,7 +14,10 @@ import RealmSwift
 class TableCityViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
     let serialQueue = DispatchQueue(label: "serial_queue")
-    
+    let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
+    let manageTimepad: ManageEventTimepad = ManageEventTimepad()
+    let realm = try! Realm()
+    var notificationToken: NotificationToken? = nil
     
     
     override func viewDidLoad() {
@@ -22,38 +25,30 @@ class TableCityViewController: UITableViewController {
         // Do any additional setup after loading the view, typically from a nib.
         print(Realm.Configuration.defaultConfiguration.fileURL)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(cityname), name: NSNotification.Name(rawValue: "refreshCity"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(writeDBEvent), name: NSNotification.Name(rawValue: "writeDBEvent"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(cityname), name: NSNotification.Name(rawValue: "refresh"), object: nil)
+//        if load == nil {
+        manageTimepad.loadCity()
+        manageTimepad.semafore.wait(timeout: .distantFuture)
+        concurrentQueue.async (qos: .background) {
+            self.manageTimepad.loadDB(param: 1)
+        }
+            
         
-        ManageEventTimepad().loadJSON()
+//        ManageEventKudaGO().loadDetailsKudaGO(name: "Москва", slug: "Msk", number: 3)
+    
+    notificationToken = realm.addNotificationBlock {notification, realm in
+        self.tableView.reloadData()
+    }
         
-//        ManageEventKudaGO().loadcitykudago()
     }
     
     func cityname() {
-        ManageEventTimepad().loadDBcity()
         DispatchQueue.main.sync {
             self.tableView.reloadData()
             
         }
     }
-    
-    func writeDBEvent(_ event: Notification) {
-//        print("REALM 2: \(Thread.current)")
-        let notis = event.object as! Object
-//        serialQueue.async (qos: .default){
-        autoreleasepool { () -> () in
-            let realm = try! Realm()
-            realm.beginWrite()
-                print("INSERT: \(Thread.current)")
-                realm.add(notis, update: true)
-            try! realm.commitWrite()
-        }
-//        }
-        
-    }
-    
-    
+
     // Количество секций
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -80,6 +75,7 @@ class TableCityViewController: UITableViewController {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let destinationVC = segue.destination as! EventTableViewController
                 destinationVC.city = loadDB.CityName()[indexPath.row]
+//                ManageEventTimepad().loadDetailsEvent(city: loadDB.CityName()[indexPath.row])
             }
         }
     }
