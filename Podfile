@@ -7,6 +7,9 @@ target 'EventAggregator' do
   pod 'SwiftyJSON', '~> 3.1'
   pod 'Alamofire', '~> 4.5'
   pod 'RealmSwift', '~> 2.8'
+  pod 'SWRevealViewController', '~> 2.3'
+  pod 'Firebase/Core'
+  pod 'Firebase/Database'
   # Pods for EventAggregator
 
 end

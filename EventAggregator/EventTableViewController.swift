@@ -10,49 +10,71 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 import RealmSwift
+import Firebase
 
 class EventTableViewController: UITableViewController {
-    
-    var city: String = ""
+
+    var city: String = globalCity
     var nameEvent: [String] = []
     var eventDescription: [String] = []
     var startEventTime: [String] = []
     var id: [String] = []
+    var isFree: [String] = []
+//    var indexEv: [String] = []
+    
+    
     let loadDB: LoadDB = LoadDB()
     let manageDate = ManageEventTimepad()
-//    let realm = try! Realm()
-//    var notificationToken: NotificationToken? = nil
+    let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(refreshData), name: NSNotification.Name(rawValue: "refresh"), object: nil)
+
+        self.navigationItem.title = city
         
         self.tableView.estimatedRowHeight = 15
         self.tableView.rowHeight = UITableViewAutomaticDimension
+        
+        refEvent.child(globalCityKey).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+//            print(snapshot)
+            var tmpName: [String] = []
+            var tmpId: [String] = []
+            var tmpEventDescription: [String] = []
+            var tmpStartEventTime: [String] = []
+            var tmpIsFree: [String] = []
+//            var tmpIndexEv: [String] = []
+            for val in snapshot.children {
+                tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+//                print(index)
+//                tmpIndexEv.append(String(index))
+            }
+            self.nameEvent = tmpName
+            self.id = tmpId
+            self.startEventTime = tmpStartEventTime
+            self.isFree = tmpIsFree
+            self.eventDescription = tmpEventDescription
+//            self.indexEv = tmpIndexEv
+            self.tableView.reloadData()
+        })
 
-        let eventDB = loadDB.Event(name: city)
-        
-        for value in eventDB[0].eventList {
-            self.nameEvent.append(value.name)
-            self.eventDescription.append(value.event_description)
-            self.startEventTime.append(value.start_time)
-            self.id.append(value.timepad_id)
-            //                print(" jfdngjsngks")
-        }
-        
-//        notificationToken = realm.addNotificationBlock {notification, realm in
-//            
-//            self.tableView.reloadData()
+//        let eventDB = loadDB.Event(name: city)
+//        print(city)
+//        for value in eventDB[0].eventList {
+//            self.nameEvent.append(value.name)
+//            self.eventDescription.append(value.event_description)
+//            self.startEventTime.append(value.start_time)
+//            self.id.append(value.timepad_id)
 //        }
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     
     }
     
+//    print(nameEvent)
+
     func refreshData() {
         DispatchQueue.main.sync {
             self.tableView.reloadData()
@@ -83,7 +105,7 @@ class EventTableViewController: UITableViewController {
         let eventCell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath)
         //eventCell.textLabel?.text = self.nameEvent[indexPath.row]
         //eventCell.detailTextLabel?.text = self.eventDescription[indexPath.row]
-        
+
         let labelName: UILabel = eventCell.viewWithTag(1) as! UILabel
         labelName.text = self.nameEvent[indexPath.row]
         
@@ -91,7 +113,7 @@ class EventTableViewController: UITableViewController {
         labelDesc.text = self.eventDescription[indexPath.row]
         
         let labelStart: UILabel = eventCell.viewWithTag(3) as! UILabel
-        labelStart.text = Decoder().dateformatter(date: self.startEventTime[indexPath.row])
+        labelStart.text = self.startEventTime[indexPath.row]
         
         return eventCell
     }

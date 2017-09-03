@@ -41,4 +41,13 @@ class Decoder {
         
         return timeString
     }
+    
+    func timeConvert(sec: String) -> String {
+        let seconds = NSDate(timeIntervalSince1970: Double(sec)!)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        let time = formatter.string(from: seconds as Date)
+        return time
+    }
+    
 }
