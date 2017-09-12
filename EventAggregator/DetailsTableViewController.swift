@@ -12,8 +12,6 @@ var place: String = ""
 
 class DetailsTableViewController: UITableViewController {
     
-    @IBOutlet weak var menuButton: UIBarButtonItem!
-    
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
 
@@ -150,8 +148,8 @@ class DetailsTableViewController: UITableViewController {
             LabelMinCostDetails.text = "Уточняйте в месте проведения"
         }
         
-        let LabelMaxCostDetails: UILabel = detailsCell.viewWithTag(6) as! UILabel
-        LabelMaxCostDetails.text = place
+//        let LabelMaxCostDetails: UILabel = detailsCell.viewWithTag(6) as! UILabel
+//        LabelMaxCostDetails.text = place
 
         return detailsCell
     }
