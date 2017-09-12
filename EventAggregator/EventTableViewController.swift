@@ -11,10 +11,14 @@ import Alamofire
 import SwiftyJSON
 import RealmSwift
 import Firebase
+import SWRevealViewController
+
 
 class EventTableViewController: UITableViewController {
 
-    var city: String = globalCity
+    @IBOutlet weak var menuButton: UIBarButtonItem!
+    
+    var city: String = uds.value(forKey: "globalCity") as! String
     var nameEvent: [String] = []
     var eventDescription: [String] = []
     var startEventTime: [String] = []
@@ -26,42 +30,47 @@ class EventTableViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
     let manageDate = ManageEventTimepad()
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
+    let utils:Utils = Utils()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-        self.navigationItem.title = city
+        utils.getKeyEvents()
+        
+        sideMenu()
+        customizeNavBar()
+        
+        self.navigationItem.title = uds.value(forKey: "globalCity") as! String
         
         self.tableView.estimatedRowHeight = 15
         self.tableView.rowHeight = UITableViewAutomaticDimension
-        
-        refEvent.child(globalCityKey).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-//            print(snapshot)
+            
+        load()
+    
+    }
+    
+    func load() {
+        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             var tmpName: [String] = []
             var tmpId: [String] = []
             var tmpEventDescription: [String] = []
             var tmpStartEventTime: [String] = []
             var tmpIsFree: [String] = []
-//            var tmpIndexEv: [String] = []
             for val in snapshot.children {
                 tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
                 tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
                 tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
                 tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
                 tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
-//                print(index)
-//                tmpIndexEv.append(String(index))
             }
             self.nameEvent = tmpName
             self.id = tmpId
             self.startEventTime = tmpStartEventTime
             self.isFree = tmpIsFree
             self.eventDescription = tmpEventDescription
-//            self.indexEv = tmpIndexEv
             self.tableView.reloadData()
         })
-
+        
 //        let eventDB = loadDB.Event(name: city)
 //        print(city)
 //        for value in eventDB[0].eventList {
@@ -70,18 +79,26 @@ class EventTableViewController: UITableViewController {
 //            self.startEventTime.append(value.start_time)
 //            self.id.append(value.timepad_id)
 //        }
-    
     }
     
-//    print(nameEvent)
-
-    func refreshData() {
-        DispatchQueue.main.sync {
-            self.tableView.reloadData()
-            print("reload")
+    func sideMenu() {
+        if revealViewController() != nil {
+            menuButton.target = revealViewController()
+            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
+            revealViewController().rearViewRevealWidth = 250
+            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
         }
     }
-    
+    //Разрисовываем navigationBar
+    func customizeNavBar() {
+        //Цвет кнопки меню
+        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        //Цвет navigationBar
+        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 255/255, green: 150/255, blue: 35/255, alpha: 1)
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+        
+        
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -103,8 +120,6 @@ class EventTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let eventCell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath)
-        //eventCell.textLabel?.text = self.nameEvent[indexPath.row]
-        //eventCell.detailTextLabel?.text = self.eventDescription[indexPath.row]
 
         let labelName: UILabel = eventCell.viewWithTag(1) as! UILabel
         labelName.text = self.nameEvent[indexPath.row]

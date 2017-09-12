@@ -9,9 +9,6 @@
 import UIKit
 import Firebase
 
-var globalCity: String = "Москва"
-var globalCityKey: String = ""
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 

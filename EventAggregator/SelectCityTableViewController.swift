@@ -8,33 +8,51 @@
 
 import UIKit
 
-class SelectCityTableViewController: UITableViewController {
+class SelectCityTableViewController: UITableViewController, UISearchResultsUpdating {
     
     let loadDB: LoadDB = LoadDB()
-
     var sityList: [String] = []
+    var filteredCity: [String] = []
+    var searchController = UISearchController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        searchController = UISearchController(searchResultsController: nil)
+        tableView.tableHeaderView = searchController.searchBar
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        
         refEvent.observeSingleEvent(of: .value, with: { (snapshot) in
-            print(snapshot)
-            var tmpName: [String] = []
-            for val in snapshot.children {
-//                print(val)
+            if let keyValue = snapshot.value as? NSDictionary {
+                for getKey in keyValue.allKeys {
+                    refEvent.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+                        if let tmpName = snapshot.value as? NSDictionary {
+                            let subtmpname = tmpName["NAME"] as? String ?? ""
+                            self.sityList.append(subtmpname)
+                            self.tableView.reloadData()
+                        }
+                    })
+                }
             }
-//            if let value = snapshot.value as? NSDictionary {
-//                print(value)
-//            }
-            
-            self.sityList = tmpName
-            self.tableView.reloadData()
         })
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+    }
+    
+    func updateSearchResults(for searchController: UISearchController) {
+        filteredCity = sityList.filter({ (sityList:String) -> Bool in
+            if sityList.contains(searchController.searchBar.text!) {
+                return true
+            } else {
+                return false
+            }
+        })
+        self.tableView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -50,21 +68,36 @@ class SelectCityTableViewController: UITableViewController {
     }
     //Колчество показываемых строк в этой секции
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return loadDB.CityName().count
+        if searchController.isActive {
+            return filteredCity.count
+        } else {
+            return sityList.count
+        }
+//
     }
     //Эти строки данными
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cityCell", for: indexPath)
-        cell.textLabel?.text = loadDB.CityName()[indexPath.row]
+        if searchController.isActive {
+            cell.textLabel?.text = filteredCity[indexPath.row]
+        } else {
+            cell.textLabel?.text = sityList[indexPath.row]
+        }
+
         return cell
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "select" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let destinationVC = segue.destination as! SettingsTableViewController
-                destinationVC.selectCity = loadDB.CityName()[indexPath.row]
-                globalCity = loadDB.CityName()[indexPath.row]
+                if searchController.isActive {
+                    let destinationVC = segue.destination as! SettingsTableViewController
+                    destinationVC.selectCity = filteredCity[indexPath.row]
+                } else {
+                    let destinationVC = segue.destination as! SettingsTableViewController
+                    destinationVC.selectCity = sityList[indexPath.row]
+
+                }
             }
         }
     }

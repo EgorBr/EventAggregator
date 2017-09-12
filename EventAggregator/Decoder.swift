@@ -50,4 +50,13 @@ class Decoder {
         return time
     }
     
+    func timeConvertToSec(startTime: String) -> Int {
+        let datef = DateFormatter() // formatter
+        datef.dateFormat = "dd.MM.yyyy HH:mm" // format
+        let date = datef.date(from: startTime) // date "May 8, 2015, 5:25 PM"
+//        let offset:NSTimeInterval = 3 * 3600 // (+3 hours) // hours offset
+        let timestamp = date!.timeIntervalSince1970// + offset //1431105930
+        return Int(timestamp)
+    }
+    
 }

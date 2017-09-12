@@ -8,15 +8,16 @@
 
 import UIKit
 
+var place: String = ""
+
 class DetailsTableViewController: UITableViewController {
     
+    @IBOutlet weak var menuButton: UIBarButtonItem!
     
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
 
     var idEvent: String = ""
-//    var indEvent: String = ""
-//    var event: [String] = []
     var name: String = ""
     var details: String = ""
     var fullDetails: String = ""
@@ -25,22 +26,22 @@ class DetailsTableViewController: UITableViewController {
     var org: String = ""
     var img: String = ""
     var eventKey: String = ""
+    var price: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.tableView.estimatedRowHeight = 150
+        self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
         
-        
-        
-        refEvent.child(globalCityKey).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKey in keyValue.allKeys {
-                    refEvent.child(globalCityKey).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+                    refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let tmpId = snapshot.value as? NSDictionary {
                             let subtmpid = tmpId["id"] as? String ?? ""
                             if self.idEvent == subtmpid {
                                 self.eventKey = getKey as! String
-                                self.manageKudaGO.loadDetailsEventKudaGo(eventKey: self.eventKey)
                                 NotificationCenter.default.post(name: NSNotification.Name(rawValue: "loadData"), object: nil)
                             }
                         }
@@ -49,36 +50,6 @@ class DetailsTableViewController: UITableViewController {
             }
         })
         
-//        refEvent.child(globalCityKey).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-//            print(snapshot)
-//            if let val = snapshot.value as? NSDictionary {
-//                let name = val["title"] as? String ?? ""
-//                print(name)
-//                if name == "" {
-//                    concurrentQueue.async(qos: .userInitiated) {
-//                        self.manageKudaGO.loadDetailsEventKudaGo(ident: self.idEvent)
-//                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "loadData"), object: nil)
-//                    }
-//                } 
-//            }
-//        })
-
-        self.tableView.estimatedRowHeight = 150
-        self.tableView.rowHeight = UITableViewAutomaticDimension
-        
-//        print(idEvent)
-        
-//        let event = loadDB.eventDescription(id: idEvent)
-//        for value in event {
-//            name = value.name
-//            details = value.event_description
-//            fullDetails = value.full_event_description
-//            start = value.start_time
-//            end = value.end_time
-//            org = value.creat_org
-//            img = value.img
-//        }
-//        print(event)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -87,26 +58,34 @@ class DetailsTableViewController: UITableViewController {
     }
     
     func loadData() {
-        refEvent.child(globalCityKey).child("Events").child(eventKey).observeSingleEvent(of: .value, with: { (snapshot) in
-            print(snapshot)
+        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(eventKey).observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
                 let tmpName = val["title"] as? String ?? ""
                 let tmpFull = val["body_text"] as? String ?? ""
                 let tmpImg = val["image"] as? String ?? ""
                 let tmpStart = val["start_event"] as? String ?? ""
                 let tmpEnd = val["stop_event"] as? String ?? ""
-                //                let tmpOrg = val["stop_event"] as? String ?? ""
+                let tmpPlace = val["place"] as? String ?? ""
+                let tmpPrice = val["price"] as? String ?? ""
 
                 self.fullDetails = tmpFull
                 self.name = tmpName
                 self.img = tmpImg
                 self.start = tmpStart
                 self.end = tmpEnd
+                self.price = tmpPrice
+//                self.manageKudaGO.printNamePlace(idPlace: tmpPlace)
             }
             self.tableView.reloadData()
             
         })
 
+    }
+    
+    func reloadTableView() {
+        DispatchQueue.main.sync {
+            self.tableView.reloadData()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -160,19 +139,19 @@ class DetailsTableViewController: UITableViewController {
         let LabelStopDetails: UILabel = detailsCell.viewWithTag(4) as! UILabel
         if end != "" {
             LabelStopDetails.text = end
-        }
-        else {
+        } else {
             LabelStopDetails.text = ""
         }
         
-        let LabelOrgDetails: UILabel = detailsCell.viewWithTag(7) as! UILabel
-        LabelOrgDetails.text = self.org
-        
         let LabelMinCostDetails: UILabel = detailsCell.viewWithTag(5) as! UILabel
-        LabelMinCostDetails.text = ""
+        if price != "" {
+            LabelMinCostDetails.text = self.price
+        } else {
+            LabelMinCostDetails.text = "Уточняйте в месте проведения"
+        }
         
         let LabelMaxCostDetails: UILabel = detailsCell.viewWithTag(6) as! UILabel
-        LabelMaxCostDetails.text = ""
+        LabelMaxCostDetails.text = place
 
         return detailsCell
     }

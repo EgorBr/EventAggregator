@@ -7,13 +7,15 @@
 //
 
 import UIKit
+import SWRevealViewController
 
 class SettingsTableViewController: UITableViewController {
-    
+    @IBOutlet weak var menuButton: UIBarButtonItem!
     @IBOutlet weak var kudaGOSwitch: UISwitch!
     @IBOutlet weak var timePadSwitch: UISwitch!
     @IBOutlet weak var ponaminaluSwitch: UISwitch!
     @IBOutlet weak var ticketLandSwitch: UISwitch!
+   
     
     let loadDB: LoadDB = LoadDB()
     var selectCity: String = ""
@@ -21,22 +23,60 @@ class SettingsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        sideMenu()
+        customizeNavBar()
+        
+        print(selectCity)
+        
+        if selectCity == "" { }
+        else if selectCity != uds.value(forKey: "globalCity") as! String {
+            uds.set(selectCity, forKey: "globalCity")
+            ViewController().reloadKeyCity()
+//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+        }
+        
+        
         self.kudaGOSwitch.addTarget(self, action: #selector(showKudaGo), for: .valueChanged)
         self.timePadSwitch.addTarget(self, action: #selector(showtimaPad), for: .valueChanged)
         self.ponaminaluSwitch.addTarget(self, action: #selector(showPonaminalu), for: .valueChanged)
         self.ticketLandSwitch.addTarget(self, action: #selector(showTicketLand), for: .valueChanged)
+        
+        
+//        showKudaGo = UserDefaults.standard.value(forKey: "showKudaGO")
 
-        globalCity = selectCity
+//        globalCity = selectCity
+    }
+    
+    func sideMenu() {
+        if revealViewController() != nil {
+            menuButton.target = revealViewController()
+            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
+            revealViewController().rearViewRevealWidth = 250
+            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+        }
+    }
+    //Разрисовываем navigationBar
+    func customizeNavBar() {
+        //Цвет кнопки меню
+        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        //Цвет navigationBar
+        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 255/255, green: 150/255, blue: 35/255, alpha: 1)
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
 
     func showKudaGo() {
+        
         if self.kudaGOSwitch.isOn {
-            let showKudaGO = true
+//            let showKudaGO = true
+//            UserDefaults.standard.set(showKudaGO, forKey: "showKudaGO")
             print("ON")
         } else {
-            let showKudaGO = false
+//            let showKudaGO = false
+//            UserDefaults.standard.set(showKudaGO, forKey: "showKudaGO")
             print("OFF")
         }
+        
+        
     }
     
     func showtimaPad() {
@@ -85,7 +125,7 @@ class SettingsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
-        cell.textLabel?.text = globalCity
+        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
         return cell
     }
     
