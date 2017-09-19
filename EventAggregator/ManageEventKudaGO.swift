@@ -17,23 +17,23 @@ class ManageEventKudaGO {
     let urlKudaGO = "https://kudago.com/public-api/v1.3/"    
     let decoder: Decoder = Decoder()
     
-//    func loadCityKudaGo() {
-//        
-//        Alamofire.request(urlKudaGO+"locations/?lang=ru", method: .get).validate().responseJSON { response in
-//            switch response.result {
-//            case .success(let value):
-//                let json = JSON(value)
-////                refEvent.removeValue()
-//                for (_, subJSON) in json[] {
-//                    let key = refEvent.childByAutoId().key
-//                    refEvent.child(key).child("NAME").setValue(subJSON["name"].stringValue)
-//                    refEvent.child(key).child("SLUG").setValue(subJSON["slug"].stringValue)
-//                }
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-//    }
+    func loadCityKudaGo() {
+        
+        Alamofire.request(urlKudaGO+"locations/?lang=ru", method: .get).validate().responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+//                refEvent.removeValue()
+                for (_, subJSON) in json[] {
+                    let key = refEvent.childByAutoId().key
+                    refEvent.child(key).child("NAME").setValue(subJSON["name"].stringValue)
+                    refEvent.child(key).child("SLUG").setValue(subJSON["slug"].stringValue)
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
     
     func loadEventKudaGO() {
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -43,9 +43,8 @@ class ManageEventKudaGO {
                     switch response.result {
                     case .success(let value):
                         let json = JSON(value)
-                        print(idArr)
                         for (_, subJSON) in json["results"] {
-                            if idArr.contains(subJSON["id"].stringValue) {}
+                            if idArr.contains(subJSON["title"].stringValue) {}
                             else {
                                 let key = refEvent.child(UserDefaults.standard.value(forKey: "globalCityKey") as! String).childByAutoId().key
                                 refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("id").setValue(subJSON["id"].stringValue)
@@ -62,7 +61,7 @@ class ManageEventKudaGO {
                                 refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("price").setValue(subJSON["price"].stringValue)
                                 refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("image").setValue(subJSON["images"][0]["image"].stringValue)
                                 refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("participants").setValue(subJSON["participants"][0]["agent"]["title"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("KudaGo").setValue("1")
+                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("KudaGo").setValue("true")
                                 for(index, subSubJSON) in subJSON["tags"] {
                                     refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("tags").child(String(index)).setValue(subSubJSON.stringValue)
                                 }
@@ -82,6 +81,7 @@ class ManageEventKudaGO {
     
     
     func loadPlaces(idPlace: String) {
+        
         Alamofire.request(self.urlKudaGO+"places/\(idPlace)/?lang=ru&text_format=text", method: .get).validate().responseJSON { response in
             switch response.result {
             case .success(let value):

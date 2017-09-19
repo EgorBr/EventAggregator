@@ -14,7 +14,12 @@ class DetailsTableViewController: UITableViewController {
     
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
+    
+//    @IBOutlet weak var placeButton: UIButton!
+//    @IBOutlet weak var buyTicketButton: UIButton!
+//    @IBOutlet weak var favoriteButton: UIButton!
 
+    
     var idEvent: String = ""
     var name: String = ""
     var details: String = ""
@@ -25,13 +30,16 @@ class DetailsTableViewController: UITableViewController {
     var img: String = ""
     var eventKey: String = ""
     var price: String = ""
+    var place: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.tableView.estimatedRowHeight = 150
         self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
         
+        //Получаем ID Мероприятия для звывода
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKey in keyValue.allKeys {
@@ -59,12 +67,14 @@ class DetailsTableViewController: UITableViewController {
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(eventKey).observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
                 let tmpName = val["title"] as? String ?? ""
-                let tmpFull = val["body_text"] as? String ?? ""
+                let tmpFull = val["description"] as? String ?? ""
                 let tmpImg = val["image"] as? String ?? ""
                 let tmpStart = val["start_event"] as? String ?? ""
                 let tmpEnd = val["stop_event"] as? String ?? ""
-                let tmpPlace = val["place"] as? String ?? ""
+                let tmpPlace = val["rice"] as? String ?? ""
                 let tmpPrice = val["price"] as? String ?? ""
+                let tmpShot = val["short_title"] as? String ?? ""
+
 
                 self.fullDetails = tmpFull
                 self.name = tmpName
@@ -72,6 +82,9 @@ class DetailsTableViewController: UITableViewController {
                 self.start = tmpStart
                 self.end = tmpEnd
                 self.price = tmpPrice
+                self.place = tmpPlace
+                self.details = tmpShot
+//                self.placeButton.setTitle(tmpPlace, for: .normal)
 //                self.manageKudaGO.printNamePlace(idPlace: tmpPlace)
             }
             self.tableView.reloadData()
@@ -125,7 +138,7 @@ class DetailsTableViewController: UITableViewController {
         
         let LabelFullDetails: UILabel = detailsCell.viewWithTag(2) as! UILabel
         if fullDetails == "" {
-            LabelFullDetails.text = "Увы, описание нет. Извините"
+            LabelFullDetails.text = self.details
         } else {
             LabelFullDetails.text = self.fullDetails
         }

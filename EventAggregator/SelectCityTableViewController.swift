@@ -12,6 +12,7 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
     
     let loadDB: LoadDB = LoadDB()
     var sityList: [String] = []
+    var sortCity: [String] = []
     var filteredCity: [String] = []
     var searchController = UISearchController()
     
@@ -30,6 +31,7 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
                         if let tmpName = snapshot.value as? NSDictionary {
                             let subtmpname = tmpName["NAME"] as? String ?? ""
                             self.sityList.append(subtmpname)
+                            self.sortCity = self.sityList.sorted(by: < )
                             self.tableView.reloadData()
                         }
                     })
@@ -79,9 +81,9 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cityCell", for: indexPath)
         if searchController.isActive {
-            cell.textLabel?.text = filteredCity[indexPath.row]
+            cell.textLabel?.text = filteredCity.sorted(by: < )[indexPath.row]
         } else {
-            cell.textLabel?.text = sityList[indexPath.row]
+            cell.textLabel?.text = sortCity[indexPath.row]
         }
 
         return cell
@@ -92,14 +94,16 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
             if let indexPath = tableView.indexPathForSelectedRow {
                 if searchController.isActive {
                     let destinationVC = segue.destination as! SettingsTableViewController
-                    destinationVC.selectCity = filteredCity[indexPath.row]
+                    destinationVC.selectCity = filteredCity.sorted(by: < )[indexPath.row]
+                    dismiss(animated: true, completion: nil)
                 } else {
                     let destinationVC = segue.destination as! SettingsTableViewController
-                    destinationVC.selectCity = sityList[indexPath.row]
-
+                    destinationVC.selectCity = sortCity[indexPath.row]
+                    dismiss(animated: true, completion: nil)
                 }
             }
         }
+        dismiss(animated: true, completion: nil)
     }
     /*
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

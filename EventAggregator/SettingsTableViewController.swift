@@ -10,11 +10,11 @@ import UIKit
 import SWRevealViewController
 
 class SettingsTableViewController: UITableViewController {
+    
     @IBOutlet weak var menuButton: UIBarButtonItem!
     @IBOutlet weak var kudaGOSwitch: UISwitch!
     @IBOutlet weak var timePadSwitch: UISwitch!
     @IBOutlet weak var ponaminaluSwitch: UISwitch!
-    @IBOutlet weak var ticketLandSwitch: UISwitch!
    
     
     let loadDB: LoadDB = LoadDB()
@@ -26,8 +26,6 @@ class SettingsTableViewController: UITableViewController {
         sideMenu()
         customizeNavBar()
         
-        print(selectCity)
-        
         if selectCity == "" { }
         else if selectCity != uds.value(forKey: "globalCity") as! String {
             uds.set(selectCity, forKey: "globalCity")
@@ -37,14 +35,13 @@ class SettingsTableViewController: UITableViewController {
         
         
         self.kudaGOSwitch.addTarget(self, action: #selector(showKudaGo), for: .valueChanged)
-        self.timePadSwitch.addTarget(self, action: #selector(showtimaPad), for: .valueChanged)
+        self.timePadSwitch.addTarget(self, action: #selector(showTimePad), for: .valueChanged)
         self.ponaminaluSwitch.addTarget(self, action: #selector(showPonaminalu), for: .valueChanged)
-        self.ticketLandSwitch.addTarget(self, action: #selector(showTicketLand), for: .valueChanged)
-        
-        
-//        showKudaGo = UserDefaults.standard.value(forKey: "showKudaGO")
 
-//        globalCity = selectCity
+        kudaGOSwitch.isOn = uds.bool(forKey: "switchKudaGO")
+        timePadSwitch.isOn = uds.bool(forKey: "switchTimaPad")
+        ponaminaluSwitch.isOn = uds.bool(forKey: "switchPonaminalu")
+
     }
     
     func sideMenu() {
@@ -67,41 +64,28 @@ class SettingsTableViewController: UITableViewController {
     func showKudaGo() {
         
         if self.kudaGOSwitch.isOn {
-//            let showKudaGO = true
-//            UserDefaults.standard.set(showKudaGO, forKey: "showKudaGO")
-            print("ON")
+            uds.set(true, forKey: "switchKudaGO")
         } else {
-//            let showKudaGO = false
-//            UserDefaults.standard.set(showKudaGO, forKey: "showKudaGO")
-            print("OFF")
+            uds.set(false, forKey: "switchKudaGO")
         }
-        
-        
     }
     
-    func showtimaPad() {
+    func showTimePad() {
         if timePadSwitch.isOn {
-            let showTime = true
+            uds.set(true, forKey: "switchTimaPad")
         } else {
-            let showTime = false
+            uds.set(true, forKey: "switchTimaPad")
         }
     }
     
     func showPonaminalu() {
         if ponaminaluSwitch.isOn {
-            let showPonaminalu = true
+            uds.set(true, forKey: "switchPonaminalu")
         } else {
-            let showPonaminalu = false
+            uds.set(true, forKey: "switchPonaminalu")
         }
     }
     
-    func showTicketLand() {
-        if ticketLandSwitch.isOn {
-            let showTicketLand = true
-        } else {
-            let showTicketLand = false
-        }
-    }
     
 //    self.print(selectCity)
     
@@ -123,11 +107,11 @@ class SettingsTableViewController: UITableViewController {
 //    }
 
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
-        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
-        return cell
-    }
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
+//        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
+//        return cell
+//    }
     
 
     /*

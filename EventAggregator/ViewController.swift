@@ -11,7 +11,7 @@ import RealmSwift
 import SWRevealViewController
 
 
-class ViewController: UIViewController, FavoriteTableViewControllerDelegate {
+class ViewController: UIViewController {
     
     @IBOutlet weak var menuButton: UIBarButtonItem!
     
@@ -23,10 +23,11 @@ class ViewController: UIViewController, FavoriteTableViewControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        utils.getKeyEvents()
-//        print(manageKudaGo.printNamePlace(idPlace: "11942"))
-//        managePonaminalu.loadEventPonaminalu()
-
+        
+        if uds.value(forKey: "globalCity") != nil {
+            startUtils()
+        }
+        
         sideMenu()
         customizeNavBar()
 
@@ -36,20 +37,35 @@ class ViewController: UIViewController, FavoriteTableViewControllerDelegate {
             uds.set("Москва", forKey: "globalCity")
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
-        
+
         if uds.value(forKey: "lastLoad") == nil {
             uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
         }
         
         if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 28800 {
-            manageKudaGo.loadEventKudaGO()
-            uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
+            if uds.bool(forKey: "switchKudaGO") == true {
+                manageKudaGo.loadEventKudaGO()
             }
+            if uds.bool(forKey: "switchPonaminalu") == true {
+                managePonaminalu.loadEventPonaminalu()
+            }
+            if uds.bool(forKey: "switchTimaPad") == true {
+                print("TimePad is ON")
+            }
+            uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func startUtils() {
+        concurrentQueue.async(qos: .userInitiated) {
+            self.utils.getKeyEvents()
+            self.utils.removeEvent()
+        }
     }
     
     func reloadKeyCity() {
@@ -77,14 +93,14 @@ class ViewController: UIViewController, FavoriteTableViewControllerDelegate {
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "favorite" {
-            let destionationVC: FavoriteTableViewController = segue.destination as! FavoriteTableViewController
-            destionationVC.delegate = self
-        }
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "favorite" {
+//            let destionationVC: FavoriteTableViewController = segue.destination as! FavoriteTableViewController
+//            destionationVC.delegate = self
+//        }
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-    }
+//    }
 
 
 }

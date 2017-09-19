@@ -29,10 +29,23 @@ class Decoder {
         return decodedString
     }
     
-    func dateformatter(date: String!) -> String {
+    func dfTP(date: String!) -> String {
         
         let deFormatter = DateFormatter()
         deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        let startTime = deFormatter.date(from: date)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        let timeString = formatter.string(from: startTime!)
+        
+        return timeString
+    }
+    
+    func dfPonam(date: String!) -> String {
+        print(date)
+        let deFormatter = DateFormatter()
+        deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let startTime = deFormatter.date(from: date)
         
         let formatter = DateFormatter()
@@ -51,11 +64,10 @@ class Decoder {
     }
     
     func timeConvertToSec(startTime: String) -> Int {
-        let datef = DateFormatter() // formatter
-        datef.dateFormat = "dd.MM.yyyy HH:mm" // format
-        let date = datef.date(from: startTime) // date "May 8, 2015, 5:25 PM"
-//        let offset:NSTimeInterval = 3 * 3600 // (+3 hours) // hours offset
-        let timestamp = date!.timeIntervalSince1970// + offset //1431105930
+        let datef = DateFormatter()
+        datef.dateFormat = "dd.MM.yyyy HH:mm"
+        let date = datef.date(from: startTime)
+        let timestamp = date!.timeIntervalSince1970
         return Int(timestamp)
     }
     

@@ -33,7 +33,7 @@ class Utils {
                 for getKey in keyValue.allKeys {
                     refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let tmpIdKey = snapshot.value as? NSDictionary {
-                            let subtmpIdKey = tmpIdKey["id"] as? String ?? ""
+                            let subtmpIdKey = tmpIdKey["title"] as? String ?? ""
                             tmpidArr.append(subtmpIdKey)
                             idArr = tmpidArr
                         }
@@ -75,7 +75,8 @@ class Utils {
                         if let startTime = snapshot.value as? NSDictionary {
                             let tmpStartTime = startTime["start_event"] as? String ?? ""
                             if Int(NSDate().timeIntervalSince1970) - Decoder().timeConvertToSec(startTime: tmpStartTime) > 10000 {
-//                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").removeValue(getKeyRemove)
+                                print("REMOVE \(getKeyRemove as! String)")
+                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKeyRemove as! String).removeValue()
                             }
                         }
                     })

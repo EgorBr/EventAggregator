@@ -10,21 +10,15 @@ import UIKit
 import FirebaseDatabase
 import SWRevealViewController
 
-protocol FavoriteTableViewControllerDelegate {
-    func sideMenu()
-    func customizeNavBar()
-}
-
 class FavoriteTableViewController: UITableViewController {
 
-    var delegate: FavoriteTableViewControllerDelegate?
     @IBOutlet weak var menuButton: UIBarButtonItem!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        delegate?.sideMenu()
-        delegate?.customizeNavBar()
+        sideMenu()
+        customizeNavBar()
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -33,22 +27,22 @@ class FavoriteTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
 
-//    func sideMenu() {
-//        if revealViewController() != nil {
-//            menuButton.target = revealViewController()
-//            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
-//            revealViewController().rearViewRevealWidth = 250
-//            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
-//        }
-//    }
-//    //Разрисовываем navigationBar
-//    func customizeNavBar() {
-//        //Цвет кнопки меню
-//        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-//        //Цвет navigationBar
-//        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 255/255, green: 150/255, blue: 35/255, alpha: 1)
-//        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-//    }
+    func sideMenu() {
+        if revealViewController() != nil {
+            menuButton.target = revealViewController()
+            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
+            revealViewController().rearViewRevealWidth = 250
+            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+        }
+    }
+    //Разрисовываем navigationBar
+    func customizeNavBar() {
+        //Цвет кнопки меню
+        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        //Цвет navigationBar
+        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 255/255, green: 150/255, blue: 35/255, alpha: 1)
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

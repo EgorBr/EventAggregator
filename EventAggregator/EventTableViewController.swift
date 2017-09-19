@@ -28,8 +28,9 @@ class EventTableViewController: UITableViewController {
     
     
     let loadDB: LoadDB = LoadDB()
-    let manageDate = ManageEventTimepad()
+    let manageTimepad: ManageEventTimepad = ManageEventTimepad()
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
+    let managePonaminalu: ManagePonaminaluEvent = ManagePonaminaluEvent()
     let utils:Utils = Utils()
     
     override func viewDidLoad() {
@@ -51,6 +52,17 @@ class EventTableViewController: UITableViewController {
     
     func load() {
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+            if snapshot as? String ?? "" == "" {
+                if uds.bool(forKey: "switchKudaGO") == true {
+                    self.manageKudaGo.loadEventKudaGO()
+                }
+                if uds.bool(forKey: "switchPonaminalu") == true {
+                    self.managePonaminalu.loadEventPonaminalu()
+                }
+                if uds.bool(forKey: "switchTimaPad") == true {
+                    print("TimePad is ON")
+                }
+            }
             var tmpName: [String] = []
             var tmpId: [String] = []
             var tmpEventDescription: [String] = []
