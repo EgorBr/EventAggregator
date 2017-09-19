@@ -555,6 +555,11 @@
                             <outlet property="delegate" destination="cDX-d5-LPE" id="AHW-yj-iPh"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <outlet property="buyTicketButton" destination="kVv-4J-5nZ" id="FdP-03-uu0"/>
+                        <outlet property="favoriteButton" destination="E0F-pI-bVZ" id="YIj-7Q-rck"/>
+                        <outlet property="placeButton" destination="0ua-EC-z2u" id="Phk-aQ-wmD"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NlC-SE-oYQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

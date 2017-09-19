@@ -15,9 +15,9 @@ class DetailsTableViewController: UITableViewController {
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
     
-//    @IBOutlet weak var placeButton: UIButton!
-//    @IBOutlet weak var buyTicketButton: UIButton!
-//    @IBOutlet weak var favoriteButton: UIButton!
+    @IBOutlet weak var placeButton: UIButton!
+    @IBOutlet weak var buyTicketButton: UIButton!
+    @IBOutlet weak var favoriteButton: UIButton!
 
     
     var idEvent: String = ""
