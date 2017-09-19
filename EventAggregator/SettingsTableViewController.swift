@@ -107,11 +107,11 @@ class SettingsTableViewController: UITableViewController {
 //    }
 
     
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
-//        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
-//        return cell
-//    }
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
+        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
+        return cell
+    }
     
 
     /*
