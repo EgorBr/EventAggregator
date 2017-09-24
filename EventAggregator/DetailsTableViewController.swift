@@ -10,15 +10,21 @@ import UIKit
 
 var place: String = ""
 
+class ButtonDetailsTableViewControllerCell: UITableViewCell {
+    @IBOutlet weak var placeButton: UIButton!
+    @IBOutlet weak var buyTicketButton: UIButton!
+    @IBOutlet weak var favoriteButton: UIButton!
+    @IBOutlet weak var LabelFullDetails: UILabel!
+    @IBOutlet weak var LabelNameDetails: UILabel!
+    @IBOutlet weak var LabelStartDetails: UILabel!
+    @IBOutlet weak var LabelStopDetails: UILabel!
+    @IBOutlet weak var LabelCost: UILabel!
+}
+
 class DetailsTableViewController: UITableViewController {
     
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
-    
-    @IBOutlet weak var placeButton: UIButton!
-    @IBOutlet weak var buyTicketButton: UIButton!
-    @IBOutlet weak var favoriteButton: UIButton!
-
     
     var idEvent: String = ""
     var name: String = ""
@@ -71,7 +77,7 @@ class DetailsTableViewController: UITableViewController {
                 let tmpImg = val["image"] as? String ?? ""
                 let tmpStart = val["start_event"] as? String ?? ""
                 let tmpEnd = val["stop_event"] as? String ?? ""
-                let tmpPlace = val["rice"] as? String ?? ""
+                let tmpPlace = val["place"] as? String ?? ""
                 let tmpPrice = val["price"] as? String ?? ""
                 let tmpShot = val["short_title"] as? String ?? ""
 
@@ -84,7 +90,7 @@ class DetailsTableViewController: UITableViewController {
                 self.price = tmpPrice
                 self.place = tmpPlace
                 self.details = tmpShot
-//                self.placeButton.setTitle(tmpPlace, for: .normal)
+                self.place = tmpPlace
 //                self.manageKudaGO.printNamePlace(idPlace: tmpPlace)
             }
             self.tableView.reloadData()
@@ -118,7 +124,7 @@ class DetailsTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath)
+        let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath) as! ButtonDetailsTableViewControllerCell
         
         if img != "" {
 //            concurrentQueue.async {
@@ -132,35 +138,31 @@ class DetailsTableViewController: UITableViewController {
 //                self.tableView.reloadData()
 //            }
         }
-        
-        let LabelNameDetails: UILabel = detailsCell.viewWithTag(1) as! UILabel
-        LabelNameDetails.text = self.name
-        
-        let LabelFullDetails: UILabel = detailsCell.viewWithTag(2) as! UILabel
+
+        detailsCell.LabelNameDetails.text = self.name
+        detailsCell.placeButton.setTitle(place, for: .normal)
+        detailsCell.LabelStartDetails.text = self.start
+
         if fullDetails == "" {
-            LabelFullDetails.text = self.details
+            detailsCell.LabelFullDetails.text = self.details
         } else {
-            LabelFullDetails.text = self.fullDetails
+            detailsCell.LabelFullDetails.text = self.fullDetails
         }
-        
-//
-        let LabelStartDetails: UILabel = detailsCell.viewWithTag(3) as! UILabel
-        LabelStartDetails.text = self.start
-        
-        let LabelStopDetails: UILabel = detailsCell.viewWithTag(4) as! UILabel
+
         if end != "" {
-            LabelStopDetails.text = end
+            detailsCell.LabelStopDetails.text = end
         } else {
-            LabelStopDetails.text = ""
+            detailsCell.LabelStopDetails.text = ""
         }
-        
-        let LabelMinCostDetails: UILabel = detailsCell.viewWithTag(5) as! UILabel
+
         if price != "" {
-            LabelMinCostDetails.text = self.price
+            detailsCell.LabelCost.text = self.price
         } else {
-            LabelMinCostDetails.text = "Уточняйте в месте проведения"
+            detailsCell.LabelCost.text = "Уточняйте в месте проведения"
         }
         
+        
+
 //        let LabelMaxCostDetails: UILabel = detailsCell.viewWithTag(6) as! UILabel
 //        LabelMaxCostDetails.text = place
 

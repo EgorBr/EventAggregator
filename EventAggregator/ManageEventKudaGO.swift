@@ -47,23 +47,23 @@ class ManageEventKudaGO {
                             if idArr.contains(subJSON["title"].stringValue) {}
                             else {
                                 let key = refEvent.child(UserDefaults.standard.value(forKey: "globalCityKey") as! String).childByAutoId().key
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("id").setValue(subJSON["id"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("short_title").setValue(subJSON["short_title"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("description").setValue(subJSON["description"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("is_free").setValue(subJSON["is_free"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("start_event").setValue(self.decoder.timeConvert(sec: subJSON["dates"][0]["start"].stringValue))
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("stop_event").setValue(self.decoder.timeConvert(sec: subJSON["dates"][0]["end"].stringValue))
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("title").setValue(subJSON["title"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("body_text").setValue(subJSON["body_text"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("place").setValue(subJSON["place"]["id"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("categories").setValue(subJSON["categories"][0].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("age_restriction").setValue(subJSON["age_restriction"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("price").setValue(subJSON["price"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("image").setValue(subJSON["images"][0]["image"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("participants").setValue(subJSON["participants"][0]["agent"]["title"].stringValue)
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("KudaGo").setValue("true")
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/id").setValue(subJSON["id"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/short_title").setValue(subJSON["short_title"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/description").setValue(subJSON["description"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/is_free").setValue(subJSON["is_free"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/start_event").setValue(self.decoder.timeConvert(sec: subJSON["dates"][0]["start"].stringValue))
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/stop_event").setValue(self.decoder.timeConvert(sec: subJSON["dates"][0]["end"].stringValue))
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/title").setValue(subJSON["title"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/body_text").setValue(subJSON["body_text"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/place").setValue(subJSON["place"]["id"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/categories").setValue(subJSON["categories"][0].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/age_restriction").setValue(subJSON["age_restriction"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/price").setValue(subJSON["price"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/image").setValue(subJSON["images"][0]["image"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/participants").setValue(subJSON["participants"][0]["agent"]["title"].stringValue)
+                                refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/Target").setValue("kudago")
                                 for(index, subSubJSON) in subJSON["tags"] {
-                                    refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(key).child("tags").child(String(index)).setValue(subSubJSON.stringValue)
+                                    refEvent.child("\(uds.value(forKey: "globalCityKey") as! String)/Events/\(key)/tags/\(String(index))").setValue(subSubJSON.stringValue)
                                 }
                                 self.loadPlaces(idPlace: subJSON["place"]["id"].stringValue)
                             }
@@ -79,6 +79,27 @@ class ManageEventKudaGO {
         uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
     }
     
+    func eventsOfTheDays() {
+        refEvent.child(uds.value(forKey: "globalCityKey") as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+            if let value = snapshot.value as? NSDictionary {
+                let slug = value["SLUG"] as? String ?? ""
+                Alamofire.request(self.urlKudaGO+"events-of-the-day/?expand=event&text_format=text&location="+slug, method: .get).validate().responseJSON { response in
+                    switch response.result {
+                    case .success(let value):
+                        let json = JSON(value)
+                        for (index, subJSON) in json["results"] {
+                            let image = subJSON["event"]["first_image"]["thumbnails"]["640x384"].stringValue
+                            let id = subJSON["event"]["id"].stringValue
+                            Database.database().reference().child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)/\(index)/id").setValue(id)
+                            Database.database().reference().child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)/\(index)/image").setValue(image)
+                        }
+                    case .failure(let error):
+                        print(error)
+                    }
+                }
+            }
+        })
+    }
     
     func loadPlaces(idPlace: String) {
         

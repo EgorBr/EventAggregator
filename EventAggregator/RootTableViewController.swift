@@ -11,7 +11,8 @@ import RealmSwift
 import SWRevealViewController
 
 
-class ViewController: UIViewController {
+class RootTableViewController: UITableViewController//, UICollectionViewDelegate, UICollectionViewDataSource 
+{
     
     @IBOutlet weak var menuButton: UIBarButtonItem!
     
@@ -20,12 +21,36 @@ class ViewController: UIViewController {
     let managePonaminalu: ManagePonaminaluEvent = ManagePonaminaluEvent()
     let utils: Utils = Utils()
     
+    var topKGImage: [String] = []
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+
+        if uds.value(forKey: "globalCity") == nil {
+            uds.set("Москва", forKey: "globalCity")
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+        }
+        
+//        manageKudaGo.eventsOfTheDays()
+        
+        
+//        ref.child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)").observeSingleEvent(of: .value, with: { (snapshot) in
+//            for item in 0 ... snapshot.childrenCount {
+//                ref.child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)/\(item)").observeSingleEvent(of: .value, with: { (snapshot) in
+//                    if let value = snapshot.value as? NSDictionary {
+//                        print(value["image"] as? String ?? "")
+//                        self.topKGImage.append(value["image"] as? String ?? "")
+//                    }
+//                })
+//            }
+//            
+//        })
+        
         
         if uds.value(forKey: "globalCity") != nil {
-            startUtils()
+//            startUtils()
         }
         
         sideMenu()
@@ -33,10 +58,7 @@ class ViewController: UIViewController {
 
         print(Realm.Configuration.defaultConfiguration.fileURL!)
         
-        if uds.value(forKey: "globalCity") == nil {
-            uds.set("Москва", forKey: "globalCity")
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        }
+        
 
         if uds.value(forKey: "lastLoad") == nil {
             uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
@@ -60,6 +82,7 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+
     
     func startUtils() {
         concurrentQueue.async(qos: .userInitiated) {
@@ -69,8 +92,7 @@ class ViewController: UIViewController {
     }
     
     func reloadKeyCity() {
-            utils.getKeyCity(name: uds.value(forKey: "globalCity") as! String)
-            print("RELOAD CITY KEY")
+        utils.getKeyCity(name: uds.value(forKey: "globalCity") as! String)
     }
     
     func sideMenu() {
@@ -90,17 +112,44 @@ class ViewController: UIViewController {
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
      }
     
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == "favorite" {
-//            let destionationVC: FavoriteTableViewController = segue.destination as! FavoriteTableViewController
-//            destionationVC.delegate = self
-//        }
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-//    }
-
 
 }
+
+//class PonaminaluUICollectionViewCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
+//    
+//    
+//    func numberOfSections(in collectionView: UICollectionView) -> Int {
+//        return 1
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return 2
+//        
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cellPonaminalu = collectionView.dequeueReusableCell(withReuseIdentifier: "cellPonaminalu", for: indexPath) as! PonaminaluUICollectionViewCell
+//        
+//        
+//        return cellPonaminalu
+//    }
+//}
+//
+//class KudaGoUICollectionViewCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
+//
+//    func numberOfSections(in collectionView: UICollectionView) -> Int {
+//        return 1
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+//        return 4
+//        
+//    }
+//    
+//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        let cellKudaGo = collectionView.dequeueReusableCell(withReuseIdentifier: "cellKudaGo", for: indexPath) as! PonaminaluUICollectionViewCell
+//        
+//        
+//        return cellKudaGo
+//    }
+//}

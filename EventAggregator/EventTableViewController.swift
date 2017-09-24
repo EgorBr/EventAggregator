@@ -26,6 +26,8 @@ class EventTableViewController: UITableViewController {
     var isFree: [String] = []
 //    var indexEv: [String] = []
     
+    var refresher: UIRefreshControl!
+    
     
     let loadDB: LoadDB = LoadDB()
     let manageTimepad: ManageEventTimepad = ManageEventTimepad()
@@ -36,7 +38,10 @@ class EventTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        utils.getKeyEvents()
+        refresher = UIRefreshControl()
+        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refresher.addTarget(self, action: #selector(load), for: UIControlEvents.valueChanged)
+        tableView.addSubview(refresher)
         
         sideMenu()
         customizeNavBar()
@@ -69,17 +74,40 @@ class EventTableViewController: UITableViewController {
             var tmpStartEventTime: [String] = []
             var tmpIsFree: [String] = []
             for val in snapshot.children {
-                tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
-                tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
-                tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
-                tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
-                tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                if uds.bool(forKey: "switchPonaminalu") == true {
+                    if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
+                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                    }
+                }
+                if uds.bool(forKey: "switchKudaGO") == true {
+                    if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "kudago" {
+                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                    }
+                }
+                if uds.bool(forKey: "switchTimaPad") == true {
+                    if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "timapad" {
+                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                    }
+                }
             }
             self.nameEvent = tmpName
             self.id = tmpId
             self.startEventTime = tmpStartEventTime
             self.isFree = tmpIsFree
             self.eventDescription = tmpEventDescription
+            self.refresher.endRefreshing()
             self.tableView.reloadData()
         })
         

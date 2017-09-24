@@ -31,7 +31,7 @@
 		F4CA76531F4E271A0091083E /* TableCityViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA76521F4E271A0091083E /* TableCityViewController.swift */; };
 		F4D6B8EF1F22A60100A06996 /* Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D6B8EE1F22A60100A06996 /* Decoder.swift */; };
 		F4EDDCA91F4F60C900444AD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */; };
-		F4EDDCAB1F4F63AA00444AD3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDCAA1F4F63AA00444AD3 /* ViewController.swift */; };
+		F4EDDCAB1F4F63AA00444AD3 /* RootTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,7 +63,7 @@
 		F4CA76521F4E271A0091083E /* TableCityViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableCityViewController.swift; sourceTree = "<group>"; };
 		F4D6B8EE1F22A60100A06996 /* Decoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decoder.swift; sourceTree = "<group>"; };
 		F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F4EDDCAA1F4F63AA00444AD3 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,7 +145,7 @@
 		F47D02681F51BA9B00C3220B /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				F4EDDCAA1F4F63AA00444AD3 /* ViewController.swift */,
+				F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */,
 				F488C1961F27BAB200FC76A4 /* EventTableViewController.swift */,
 				F488C19C1F27D6D600FC76A4 /* DetailsTableViewController.swift */,
 				F47D02691F51BC6400C3220B /* SettingsTableViewController.swift */,
@@ -320,7 +320,7 @@
 				F488C1971F27BAB200FC76A4 /* EventTableViewController.swift in Sources */,
 				F475B5D91F1D3AAD006ACA85 /* TypeEvent.swift in Sources */,
 				F45524031F1E891600AE1318 /* LoadDB.swift in Sources */,
-				F4EDDCAB1F4F63AA00444AD3 /* ViewController.swift in Sources */,
+				F4EDDCAB1F4F63AA00444AD3 /* RootTableViewController.swift in Sources */,
 				F488C19D1F27D6D600FC76A4 /* DetailsTableViewController.swift in Sources */,
 				F476CBDF1F1D3A3B007349F5 /* EventTimepad.swift in Sources */,
 				F4CA76531F4E271A0091083E /* TableCityViewController.swift in Sources */,

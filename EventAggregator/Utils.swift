@@ -12,6 +12,7 @@ import FirebaseDatabase
 let serialQueue = DispatchQueue(label: "serial_queue")
 let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
 let semafore = DispatchSemaphore(value: 0)
+let ref = Database.database().reference()
 let refEvent = Database.database().reference().child("Event")
 let refPlace = Database.database().reference().child("Place")
 let refCategory = Database.database().reference().child("Category")
@@ -53,10 +54,9 @@ class Utils {
                             let subtmpname = tmpName["NAME"] as? String ?? ""
                             if name == subtmpname {
                                 cityKey = getKey as! String
-                                print("reload",name)
-                                print("reload",cityKey)
                                 UserDefaults.standard.set(cityKey, forKey: "globalCityKey")
-//                                self.manageKudaGo.loadEventKudaGO()
+                                print("Sema")
+                                semafore.signal()
                                 self.getKeyEvents()
                                 
                             }

@@ -15,25 +15,26 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var kudaGOSwitch: UISwitch!
     @IBOutlet weak var timePadSwitch: UISwitch!
     @IBOutlet weak var ponaminaluSwitch: UISwitch!
+    @IBOutlet weak var LableCity: UILabel!
    
     
     let loadDB: LoadDB = LoadDB()
     var selectCity: String = ""
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
+        super.viewDidLoad()        
         sideMenu()
         customizeNavBar()
         
         if selectCity == "" { }
         else if selectCity != uds.value(forKey: "globalCity") as! String {
             uds.set(selectCity, forKey: "globalCity")
-            ViewController().reloadKeyCity()
-//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+            RootTableViewController().reloadKeyCity()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
         
-        
+        LableCity.text = uds.value(forKey: "globalCity") as! String
+
         self.kudaGOSwitch.addTarget(self, action: #selector(showKudaGo), for: .valueChanged)
         self.timePadSwitch.addTarget(self, action: #selector(showTimePad), for: .valueChanged)
         self.ponaminaluSwitch.addTarget(self, action: #selector(showPonaminalu), for: .valueChanged)
@@ -74,7 +75,7 @@ class SettingsTableViewController: UITableViewController {
         if timePadSwitch.isOn {
             uds.set(true, forKey: "switchTimaPad")
         } else {
-            uds.set(true, forKey: "switchTimaPad")
+            uds.set(false, forKey: "switchTimaPad")
         }
     }
     
@@ -82,7 +83,7 @@ class SettingsTableViewController: UITableViewController {
         if ponaminaluSwitch.isOn {
             uds.set(true, forKey: "switchPonaminalu")
         } else {
-            uds.set(true, forKey: "switchPonaminalu")
+            uds.set(false, forKey: "switchPonaminalu")
         }
     }
     
@@ -93,12 +94,13 @@ class SettingsTableViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
 
     // MARK: - Table view data source
 
 //    override func numberOfSections(in tableView: UITableView) -> Int {
 //        // #warning Incomplete implementation, return the number of sections
-//        return 3
+//        return 2
 //    }
 
 //    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -107,11 +109,13 @@ class SettingsTableViewController: UITableViewController {
 //    }
 
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
-        cell.textLabel?.text = uds.value(forKey: "globalCity") as! String
-        return cell
-    }
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cellCity = tableView.dequeueReusableCell(withIdentifier: "CitySelected", for: indexPath)
+//        let LabelCity: UILabel = cellCity.viewWithTag(1) as! UILabel
+//        LabelCity.text = uds.value(forKey: "globalCity") as! String
+//
+//        return cellCity
+//    }
     
 
     /*

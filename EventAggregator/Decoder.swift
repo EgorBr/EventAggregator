@@ -43,7 +43,6 @@ class Decoder {
     }
     
     func dfPonam(date: String!) -> String {
-        print(date)
         let deFormatter = DateFormatter()
         deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         let startTime = deFormatter.date(from: date)
