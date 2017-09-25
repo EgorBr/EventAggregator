@@ -30,7 +30,7 @@ class SettingsTableViewController: UITableViewController {
         else if selectCity != uds.value(forKey: "globalCity") as! String {
             uds.set(selectCity, forKey: "globalCity")
             RootTableViewController().reloadKeyCity()
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
         
         LableCity.text = uds.value(forKey: "globalCity") as! String

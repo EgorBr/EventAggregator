@@ -27,12 +27,15 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-
+        
+        if uds.value(forKey: "globalCity") != nil {
+            startUtils()
+        }
+        
         if uds.value(forKey: "globalCity") == nil {
             uds.set("Москва", forKey: "globalCity")
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
-        
 //        manageKudaGo.eventsOfTheDays()
         
         
@@ -47,19 +50,12 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
 //            }
 //            
 //        })
-        
-        
-        if uds.value(forKey: "globalCity") != nil {
-//            startUtils()
-        }
-        
+
         sideMenu()
         customizeNavBar()
 
         print(Realm.Configuration.defaultConfiguration.fileURL!)
         
-        
-
         if uds.value(forKey: "lastLoad") == nil {
             uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
         }
@@ -86,8 +82,8 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     
     func startUtils() {
         concurrentQueue.async(qos: .userInitiated) {
-            self.utils.getKeyEvents()
             self.utils.removeEvent()
+            self.utils.getKeyEvents()
         }
     }
     

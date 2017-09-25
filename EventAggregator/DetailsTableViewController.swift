@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 var place: String = ""
 
@@ -27,6 +29,8 @@ class DetailsTableViewController: UITableViewController {
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
     
     var idEvent: String = ""
+    var searchId: String = ""
+    
     var name: String = ""
     var details: String = ""
     var fullDetails: String = ""
@@ -44,23 +48,41 @@ class DetailsTableViewController: UITableViewController {
         self.tableView.estimatedRowHeight = 150
         self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
-        
-        //Получаем ID Мероприятия для звывода
-        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-            if let keyValue = snapshot.value as? NSDictionary {
-                for getKey in keyValue.allKeys {
-                    refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let tmpId = snapshot.value as? NSDictionary {
-                            let subtmpid = tmpId["id"] as? String ?? ""
-                            if self.idEvent == subtmpid {
-                                self.eventKey = getKey as! String
-                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "loadData"), object: nil)
+        if idEvent != "" {
+            //Получаем ID Мероприятия для звывода
+            refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+                if let keyValue = snapshot.value as? NSDictionary {
+                    for getKey in keyValue.allKeys {
+                        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if let tmpId = snapshot.value as? NSDictionary {
+                                let subtmpid = tmpId["id"] as? String ?? ""
+                                if self.idEvent == subtmpid {
+                                    self.eventKey = getKey as! String
+                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "loadData"), object: nil)
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
+                }
+            })
+        } else {
+            Alamofire.request("https://kudago.com/public-api/v1.3/events/\(searchId)/?text_format=text", method: .get).validate().responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    let json = JSON(value)
+                    print(json)
+                    self.name = json["title"].stringValue
+                    self.fullDetails = json["body_text"].stringValue
+                    self.price = json["price"].stringValue
+                    self.start = Decoder().timeConvert(sec: json["dates"][0]["start"].stringValue)
+                    self.end = Decoder().timeConvert(sec: json["dates"][0]["end"].stringValue)
+                    self.img = json["images"][0]["image"].stringValue
+                    self.tableView.reloadData()
+                case .failure(let error):
+                    print(error)
                 }
             }
-        })
+        }
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -72,37 +94,29 @@ class DetailsTableViewController: UITableViewController {
     func loadData() {
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(eventKey).observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
-                let tmpName = val["title"] as? String ?? ""
-                let tmpFull = val["description"] as? String ?? ""
-                let tmpImg = val["image"] as? String ?? ""
-                let tmpStart = val["start_event"] as? String ?? ""
-                let tmpEnd = val["stop_event"] as? String ?? ""
-                let tmpPlace = val["place"] as? String ?? ""
-                let tmpPrice = val["price"] as? String ?? ""
-                let tmpShot = val["short_title"] as? String ?? ""
-
-
-                self.fullDetails = tmpFull
-                self.name = tmpName
-                self.img = tmpImg
-                self.start = tmpStart
-                self.end = tmpEnd
-                self.price = tmpPrice
-                self.place = tmpPlace
-                self.details = tmpShot
-                self.place = tmpPlace
+                self.name = val["title"] as? String ?? ""
+                self.fullDetails = val["description"] as? String ?? ""
+                self.img = val["image"] as? String ?? ""
+                self.start = val["start_event"] as? String ?? ""
+                self.end = val["stop_event"] as? String ?? ""
+                if val["Target"] as? String ?? "" == "kudago" {
+                    refPlace.child(val["place"] as? String ?? "").observeSingleEvent(of: .value, with: { (snapshot) in
+                        if let snapPlace = snapshot.value as? NSDictionary {
+                            self.place = snapPlace["title"] as? String ?? ""
+                            self.tableView.reloadData()
+                        }
+                    })
+                } else {
+                    self.place = val["place"] as? String ?? ""
+                }
+                self.price = val["price"] as? String ?? ""
+                self.details = val["short_title"] as? String ?? ""
 //                self.manageKudaGO.printNamePlace(idPlace: tmpPlace)
             }
             self.tableView.reloadData()
             
         })
 
-    }
-    
-    func reloadTableView() {
-        DispatchQueue.main.sync {
-            self.tableView.reloadData()
-        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -127,16 +141,10 @@ class DetailsTableViewController: UITableViewController {
         let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath) as! ButtonDetailsTableViewControllerCell
         
         if img != "" {
-//            concurrentQueue.async {
-//            print(self.img)
                 let imgURL: NSURL = NSURL(string: self.img)!
                 let imgData: NSData = NSData(contentsOf: imgURL as URL)!
                 let image: UIImageView = detailsCell.viewWithTag(8) as! UIImageView
                 image.image = UIImage(data: imgData as Data)
-//            }
-//            DispatchQueue.main.async {
-//                self.tableView.reloadData()
-//            }
         }
 
         detailsCell.LabelNameDetails.text = self.name
@@ -160,11 +168,6 @@ class DetailsTableViewController: UITableViewController {
         } else {
             detailsCell.LabelCost.text = "Уточняйте в месте проведения"
         }
-        
-        
-
-//        let LabelMaxCostDetails: UILabel = detailsCell.viewWithTag(6) as! UILabel
-//        LabelMaxCostDetails.text = place
 
         return detailsCell
     }

@@ -45,18 +45,23 @@ class Utils {
     }
     
     func getKeyCity (name: String) {
-        var cityKey = ""
         refEvent.observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKey in keyValue.allKeys {
                     refEvent.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let tmpName = snapshot.value as? NSDictionary {
-                            let subtmpname = tmpName["NAME"] as? String ?? ""
-                            if name == subtmpname {
-                                cityKey = getKey as! String
-                                UserDefaults.standard.set(cityKey, forKey: "globalCityKey")
-                                print("Sema")
-                                semafore.signal()
+                            if name == tmpName["NAME"] as? String ?? "" {
+                                uds.set(getKey as! String, forKey: "globalCityKey")
+                                if tmpName["SLUG"] as? String ?? "" != "" {
+                                    uds.set(tmpName["SLUG"] as? String ?? "", forKey: "citySlug")
+                                } else {
+                                    uds.set("", forKey: "citySlug")
+                                }
+                                if tmpName["REGION_ID"] as? String ?? "" != "" {
+                                    uds.set(tmpName["REGION_ID"] as? String ?? "", forKey: "regionId")
+                                } else {
+                                    uds.set("", forKey: "regionId")
+                                }
                                 self.getKeyEvents()
                                 
                             }

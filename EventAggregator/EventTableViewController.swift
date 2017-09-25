@@ -57,58 +57,37 @@ class EventTableViewController: UITableViewController {
     
     func load() {
         refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-            if snapshot as? String ?? "" == "" {
-                if uds.bool(forKey: "switchKudaGO") == true {
-                    self.manageKudaGo.loadEventKudaGO()
-                }
-                if uds.bool(forKey: "switchPonaminalu") == true {
-                    self.managePonaminalu.loadEventPonaminalu()
-                }
-                if uds.bool(forKey: "switchTimaPad") == true {
-                    print("TimePad is ON")
-                }
-            }
-            var tmpName: [String] = []
-            var tmpId: [String] = []
-            var tmpEventDescription: [String] = []
-            var tmpStartEventTime: [String] = []
-            var tmpIsFree: [String] = []
+            
             for val in snapshot.children {
                 if uds.bool(forKey: "switchPonaminalu") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
-                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
-                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
-                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
-                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
-                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
                     }
                 }
                 if uds.bool(forKey: "switchKudaGO") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "kudago" {
-                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
-                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
-                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
-                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
-                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
                     }
                 }
                 if uds.bool(forKey: "switchTimaPad") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "timapad" {
-                        tmpName.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
-                        tmpId.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
-                        tmpEventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
-                        tmpStartEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
-                        tmpIsFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                        self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                        self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                        self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                        self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
                     }
                 }
+                self.tableView.reloadData()
             }
-            self.nameEvent = tmpName
-            self.id = tmpId
-            self.startEventTime = tmpStartEventTime
-            self.isFree = tmpIsFree
-            self.eventDescription = tmpEventDescription
-            self.refresher.endRefreshing()
-            self.tableView.reloadData()
         })
         
 //        let eventDB = loadDB.Event(name: city)
