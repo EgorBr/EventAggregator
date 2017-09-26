@@ -27,13 +27,13 @@ class SettingsTableViewController: UITableViewController {
         customizeNavBar()
         
         if selectCity == "" { }
-        else if selectCity != uds.value(forKey: "globalCity") as! String {
-            uds.set(selectCity, forKey: "globalCity")
+        else if selectCity != uds.value(forKey: "city") as! String {
+            uds.set(selectCity, forKey: "city")
             RootTableViewController().reloadKeyCity()
 //            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
         
-        LableCity.text = uds.value(forKey: "globalCity") as! String
+        LableCity.text = uds.value(forKey: "city") as! String
 
         self.kudaGOSwitch.addTarget(self, action: #selector(showKudaGo), for: .valueChanged)
         self.timePadSwitch.addTarget(self, action: #selector(showTimePad), for: .valueChanged)

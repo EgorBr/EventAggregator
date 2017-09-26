@@ -28,11 +28,11 @@ class Utils {
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
 
     func getKeyEvents() {
-        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 var tmpidArr: [String] = []
                 for getKey in keyValue.allKeys {
-                    refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+                    refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let tmpIdKey = snapshot.value as? NSDictionary {
                             let subtmpIdKey = tmpIdKey["title"] as? String ?? ""
                             tmpidArr.append(subtmpIdKey)
@@ -51,7 +51,7 @@ class Utils {
                     refEvent.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let tmpName = snapshot.value as? NSDictionary {
                             if name == tmpName["NAME"] as? String ?? "" {
-                                uds.set(getKey as! String, forKey: "globalCityKey")
+                                uds.set(getKey as! String, forKey: "cityKey")
                                 if tmpName["SLUG"] as? String ?? "" != "" {
                                     uds.set(tmpName["SLUG"] as? String ?? "", forKey: "citySlug")
                                 } else {
@@ -73,15 +73,15 @@ class Utils {
     }
     
     func removeEvent() {
-        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKeyRemove in keyValue.allKeys {
-                    refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKeyRemove as! String).observeSingleEvent(of: .value, with: { (snapshot) in
+                    refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKeyRemove as! String).observeSingleEvent(of: .value, with: { (snapshot) in
                         if let startTime = snapshot.value as? NSDictionary {
                             let tmpStartTime = startTime["start_event"] as? String ?? ""
                             if Int(NSDate().timeIntervalSince1970) - Decoder().timeConvertToSec(startTime: tmpStartTime) > 10000 {
                                 print("REMOVE \(getKeyRemove as! String)")
-                                refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").child(getKeyRemove as! String).removeValue()
+                                refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKeyRemove as! String).removeValue()
                             }
                         }
                     })

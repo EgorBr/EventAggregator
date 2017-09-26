@@ -10,6 +10,7 @@ import Foundation
 import WebKit
 
 class Decoder {
+    //выбрасываем HTML текст
     func decodehtmltotxt(htmltxt: String) -> String {
         let encodedString = htmltxt
         guard let data = encodedString.data(using: .utf8) else {
@@ -28,7 +29,7 @@ class Decoder {
         let decodedString = attributedString.string
         return decodedString
     }
-    
+    //изменяем формат даты yyyy-MM-dd'T'HH:mm:ssZ -> dd.MM.yyyy HH:mm
     func dfTP(date: String!) -> String {
         
         let deFormatter = DateFormatter()
@@ -41,7 +42,7 @@ class Decoder {
         
         return timeString
     }
-    
+    //изменяем формат даты yyyy-MM-dd'T'HH:mm:ss -> dd.MM.yyyy HH:mm
     func dfPonam(date: String!) -> String {
         let deFormatter = DateFormatter()
         deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
@@ -53,7 +54,7 @@ class Decoder {
         
         return timeString
     }
-    
+    //переводим из секунд в dd.MM.yyyy HH:mm
     func timeConvert(sec: String) -> String {
         let seconds = NSDate(timeIntervalSince1970: Double(sec)!)
         let formatter = DateFormatter()
@@ -61,7 +62,7 @@ class Decoder {
         let time = formatter.string(from: seconds as Date)
         return time
     }
-    
+    // переводим dd.MM.yyyy HH:mm -> СЕК
     func timeConvertToSec(startTime: String) -> Int {
         let datef = DateFormatter()
         datef.dateFormat = "dd.MM.yyyy HH:mm"

@@ -27,21 +27,21 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        
-        if uds.value(forKey: "globalCity") != nil {
+        //Очистака от старых эвентов и формарование массива актуальных мероприятий
+        if uds.value(forKey: "city") != nil {
             startUtils()
         }
-        
-        if uds.value(forKey: "globalCity") == nil {
-            uds.set("Москва", forKey: "globalCity")
+        //При первой загрузке задаётся город
+        if uds.value(forKey: "city") == nil {
+            uds.set("Москва", forKey: "city")
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
 //        manageKudaGo.eventsOfTheDays()
         
         
-//        ref.child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)").observeSingleEvent(of: .value, with: { (snapshot) in
+//        ref.child("Top/KudaGo/\(uds.value(forKey: "cityKey") as! String)").observeSingleEvent(of: .value, with: { (snapshot) in
 //            for item in 0 ... snapshot.childrenCount {
-//                ref.child("Top/KudaGo/\(uds.value(forKey: "globalCityKey") as! String)/\(item)").observeSingleEvent(of: .value, with: { (snapshot) in
+//                ref.child("Top/KudaGo/\(uds.value(forKey: "cityKey") as! String)/\(item)").observeSingleEvent(of: .value, with: { (snapshot) in
 //                    if let value = snapshot.value as? NSDictionary {
 //                        print(value["image"] as? String ?? "")
 //                        self.topKGImage.append(value["image"] as? String ?? "")
@@ -55,11 +55,11 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
         customizeNavBar()
 
         print(Realm.Configuration.defaultConfiguration.fileURL!)
-        
+        //создаём отмтку первого запуска чтобы вести отчёт когда почистить события
         if uds.value(forKey: "lastLoad") == nil {
             uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
         }
-        
+        //проверяем какие агрегаторы включены и делаем по ним загрузку
         if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 28800 {
             if uds.bool(forKey: "switchKudaGO") == true {
                 manageKudaGo.loadEventKudaGO()
@@ -82,13 +82,13 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     
     func startUtils() {
         concurrentQueue.async(qos: .userInitiated) {
-            self.utils.removeEvent()
-            self.utils.getKeyEvents()
+            self.utils.removeEvent() // чистит старое
+            self.utils.getKeyEvents() // делаем список актуальных
         }
     }
     
     func reloadKeyCity() {
-        utils.getKeyCity(name: uds.value(forKey: "globalCity") as! String)
+        utils.getKeyCity(name: uds.value(forKey: "city") as! String) // получаем ключ города чтобы работать с ним
     }
     
     func sideMenu() {

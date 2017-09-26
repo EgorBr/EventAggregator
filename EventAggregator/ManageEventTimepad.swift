@@ -15,10 +15,6 @@ private let _manage = ManageEventTimepad()
 
 class ManageEventTimepad {
     
-//    class var manage: ManageEventTimepad {
-//        return _manage
-//    }
-    
     let urlTimepadEvent = "https://api.timepad.ru/v1/events.json"
     let urlEvent = "https://api.timepad.ru/v1/events/"
     

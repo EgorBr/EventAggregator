@@ -23,7 +23,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         super.viewDidLoad()
         sideMenu()
         customizeNavBar()
-        
+        //создаем searchController
         searchController = UISearchController(searchResultsController: nil)
         tableView.tableHeaderView = searchController.searchBar
         searchController.searchResultsUpdater = self
@@ -34,7 +34,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+    //обработка поисковых запросов агрегаторами
     func updateSearchResults(for searchController: UISearchController) {
         result = []
         resultId = []
@@ -46,7 +46,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
             searchPonaminalu(txt: searchController.searchBar.text!)
         }
     }
-    
+    // поиск по ресурсу Ponaminalu
     func searchPonaminalu(txt: String) {
         if uds.value(forKey: "regionId") as! String != "" {
             var txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
@@ -56,7 +56,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                 case .success(let value):
                     let json = JSON(value)
                     for (_, subJSON) in json["message"] {
-                        
+                        print(subJSON)
                         self.tableView.reloadData()
                     }
                 case .failure(let error):
@@ -65,7 +65,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
             }
         }
     }
-    
+    // поиск по ресурсу Кudago
     func searchKudago(txt: String) {
         if uds.value(forKey: "citySlug") as! String != "" {
             var txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)

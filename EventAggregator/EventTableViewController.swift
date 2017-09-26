@@ -18,7 +18,7 @@ class EventTableViewController: UITableViewController {
 
     @IBOutlet weak var menuButton: UIBarButtonItem!
     
-    var city: String = uds.value(forKey: "globalCity") as! String
+    var city: String = uds.value(forKey: "city") as! String
     var nameEvent: [String] = []
     var eventDescription: [String] = []
     var startEventTime: [String] = []
@@ -37,7 +37,7 @@ class EventTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // обновление списка мерприятий свайпом вниз
         refresher = UIRefreshControl()
         refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refresher.addTarget(self, action: #selector(load), for: UIControlEvents.valueChanged)
@@ -46,7 +46,7 @@ class EventTableViewController: UITableViewController {
         sideMenu()
         customizeNavBar()
         
-        self.navigationItem.title = uds.value(forKey: "globalCity") as! String
+        self.navigationItem.title = uds.value(forKey: "city") as! String
         
         self.tableView.estimatedRowHeight = 15
         self.tableView.rowHeight = UITableViewAutomaticDimension
@@ -54,10 +54,9 @@ class EventTableViewController: UITableViewController {
         load()
     
     }
-    
+    // выводим краткую инфу по мероприятиям в зависимости отквключенных агрегаторов
     func load() {
-        refEvent.child(uds.value(forKey: "globalCityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-            
+        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             for val in snapshot.children {
                 if uds.bool(forKey: "switchPonaminalu") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
@@ -114,9 +113,7 @@ class EventTableViewController: UITableViewController {
         navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
         navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 255/255, green: 150/255, blue: 35/255, alpha: 1)
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-        
-        
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]        
     }
 
     override func didReceiveMemoryWarning() {
@@ -135,7 +132,6 @@ class EventTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return id.count
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let eventCell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath)
@@ -152,46 +148,6 @@ class EventTableViewController: UITableViewController {
         return eventCell
     }
  
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detailsEvent" {
             if let indexPath = tableView.indexPathForSelectedRow {
@@ -200,6 +156,4 @@ class EventTableViewController: UITableViewController {
             }
         }
     }
- 
-
-}
+ }
