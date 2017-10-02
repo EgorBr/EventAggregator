@@ -365,19 +365,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Адрес электронной почты" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I3z-FZ-x8x">
-                                <rect key="frame" x="31" y="117" width="313" height="16"/>
+                                <rect key="frame" x="104" y="117" width="167" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Пароль" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="H0Q-gg-ZR7">
-                                <rect key="frame" x="31" y="198" width="313" height="16"/>
+                                <rect key="frame" x="164" y="198" width="47" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Повторите пароль" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="he4-uI-7Bc">
-                                <rect key="frame" x="31" y="279" width="313" height="16"/>
+                                <rect key="frame" x="130" y="279" width="115.5" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -401,7 +401,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Как тебя зовут?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9cL-BF-r5W">
-                                <rect key="frame" x="31" y="360" width="313" height="16"/>
+                                <rect key="frame" x="138" y="360" width="99.5" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -413,7 +413,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Когда поздравить с ДР?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2VW-18-1zJ">
-                                <rect key="frame" x="31" y="441" width="313" height="16"/>
+                                <rect key="frame" x="111.5" y="441" width="152.5" height="16"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -425,62 +425,56 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="44B-gr-xbE">
-                                <rect key="frame" x="106" y="64" width="163" height="29"/>
+                                <rect key="frame" x="116" y="64" width="143" height="29"/>
                                 <segments>
                                     <segment title="Эл.почта"/>
                                     <segment title="Моб.тел."/>
                                 </segments>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Простая Регистриая" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DvF-Es-wZm">
-                                <rect key="frame" x="31" y="35" width="313" height="21"/>
+                                <rect key="frame" x="106" y="35" width="164" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sE9-OE-fBv">
-                                <rect key="frame" x="102" y="599" width="171" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sE9-OE-fBv">
+                                <rect key="frame" x="142" y="599" width="92" height="30"/>
                                 <state key="normal" title="Рагистрация"/>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="H0Q-gg-ZR7" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="0Tn-sH-22m"/>
                             <constraint firstItem="sNe-Ge-gHO" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="35" id="3MF-8b-6sQ"/>
                             <constraint firstAttribute="trailingMargin" secondItem="25J-1k-aaa" secondAttribute="trailing" constant="35" id="41q-55-QhB"/>
                             <constraint firstItem="25J-1k-aaa" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="35" id="60m-8d-DeF"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="2VW-18-1zJ" secondAttribute="trailing" constant="15" id="68G-jf-94h"/>
-                            <constraint firstItem="9cL-BF-r5W" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="87p-mv-Gkq"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="44B-gr-xbE" secondAttribute="trailing" constant="90" id="9uM-ep-g1A"/>
-                            <constraint firstItem="44B-gr-xbE" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="90" id="AhU-bI-NMK"/>
+                            <constraint firstItem="sE9-OE-fBv" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="87n-xc-99d"/>
                             <constraint firstAttribute="trailingMargin" secondItem="g6c-nC-4qJ" secondAttribute="trailing" constant="35" id="Bq9-o3-Fvx"/>
                             <constraint firstAttribute="trailingMargin" secondItem="sNe-Ge-gHO" secondAttribute="trailing" constant="35" id="D7Z-MB-nzo"/>
                             <constraint firstItem="I3z-FZ-x8x" firstAttribute="top" secondItem="44B-gr-xbE" secondAttribute="bottom" constant="25" id="EZw-Ry-k3A"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="he4-uI-7Bc" secondAttribute="trailing" constant="15" id="H1C-yb-R9w"/>
+                            <constraint firstItem="he4-uI-7Bc" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="LKU-OS-aOf"/>
                             <constraint firstItem="te5-d0-25p" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="35" id="N3P-cY-nNZ"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="H0Q-gg-ZR7" secondAttribute="trailing" constant="15" id="OeK-KO-Wzk"/>
+                            <constraint firstItem="KBh-KS-eOv" firstAttribute="top" secondItem="sE9-OE-fBv" secondAttribute="bottom" constant="38" id="PI3-Xl-uO0"/>
+                            <constraint firstItem="2VW-18-1zJ" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="Pzf-BP-v53"/>
                             <constraint firstItem="g6c-nC-4qJ" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="35" id="TAw-9R-JeT"/>
                             <constraint firstItem="iZQ-WX-P3Z" firstAttribute="top" secondItem="he4-uI-7Bc" secondAttribute="bottom" constant="10" id="TSw-vz-NBf"/>
-                            <constraint firstItem="2VW-18-1zJ" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="UA9-Vm-h9r"/>
                             <constraint firstItem="H0Q-gg-ZR7" firstAttribute="top" secondItem="g6c-nC-4qJ" secondAttribute="bottom" constant="25" id="VAE-Yj-JGx"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="9cL-BF-r5W" secondAttribute="trailing" constant="15" id="WC5-AP-PaO"/>
                             <constraint firstItem="9cL-BF-r5W" firstAttribute="top" secondItem="iZQ-WX-P3Z" secondAttribute="bottom" constant="25" id="WrL-Pn-sfr"/>
+                            <constraint firstItem="DvF-Es-wZm" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="Yx9-Jr-Vnx"/>
                             <constraint firstItem="g6c-nC-4qJ" firstAttribute="top" secondItem="I3z-FZ-x8x" secondAttribute="bottom" constant="10" id="Zeg-4C-UOD"/>
                             <constraint firstItem="DvF-Es-wZm" firstAttribute="top" secondItem="dfs-3l-qTC" secondAttribute="bottom" constant="15" id="Zpu-hO-UJY"/>
                             <constraint firstItem="25J-1k-aaa" firstAttribute="top" secondItem="H0Q-gg-ZR7" secondAttribute="bottom" constant="10" id="djU-Uy-x3u"/>
                             <constraint firstItem="2VW-18-1zJ" firstAttribute="top" secondItem="te5-d0-25p" secondAttribute="bottom" constant="25" id="eVK-68-gih"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="I3z-FZ-x8x" secondAttribute="trailing" constant="15" id="eX4-U8-crn"/>
+                            <constraint firstItem="44B-gr-xbE" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="ecE-4v-lBF"/>
                             <constraint firstAttribute="trailingMargin" secondItem="te5-d0-25p" secondAttribute="trailing" constant="35" id="gm5-oB-VWk"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="DvF-Es-wZm" secondAttribute="trailing" constant="15" id="kKl-VI-SIs"/>
                             <constraint firstItem="sNe-Ge-gHO" firstAttribute="top" secondItem="2VW-18-1zJ" secondAttribute="bottom" constant="10" id="lUD-Zs-P1A"/>
                             <constraint firstAttribute="trailingMargin" secondItem="iZQ-WX-P3Z" secondAttribute="trailing" constant="35" id="nLQ-mp-3JV"/>
+                            <constraint firstItem="9cL-BF-r5W" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="pjg-wD-NCY"/>
                             <constraint firstItem="iZQ-WX-P3Z" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="35" id="pne-7P-5S8"/>
-                            <constraint firstItem="he4-uI-7Bc" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="sfy-iF-Arq"/>
                             <constraint firstItem="he4-uI-7Bc" firstAttribute="top" secondItem="25J-1k-aaa" secondAttribute="bottom" constant="25" id="smx-zF-3Y7"/>
-                            <constraint firstItem="DvF-Es-wZm" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="utK-fo-42u"/>
                             <constraint firstItem="te5-d0-25p" firstAttribute="top" secondItem="9cL-BF-r5W" secondAttribute="bottom" constant="10" id="vnD-WF-Zyi"/>
-                            <constraint firstItem="I3z-FZ-x8x" firstAttribute="leading" secondItem="lOv-9r-0Vg" secondAttribute="leadingMargin" constant="15" id="yeO-40-DJy"/>
+                            <constraint firstItem="H0Q-gg-ZR7" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="wqD-Ka-0mz"/>
                             <constraint firstItem="44B-gr-xbE" firstAttribute="top" secondItem="DvF-Es-wZm" secondAttribute="bottom" constant="8" id="zTi-0v-ka6"/>
+                            <constraint firstItem="I3z-FZ-x8x" firstAttribute="centerX" secondItem="lOv-9r-0Vg" secondAttribute="centerX" id="zXI-cA-usC"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -1472,7 +1466,6 @@
         <image name="user" width="512" height="512"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="GCd-l2-o5D"/>
         <segue reference="IZS-mj-waY"/>
         <segue reference="Bpe-fY-8lQ"/>
         <segue reference="9HE-es-Bas"/>
