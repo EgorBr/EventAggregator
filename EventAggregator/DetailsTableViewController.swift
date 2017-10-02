@@ -10,24 +10,28 @@ import UIKit
 import Alamofire
 import SwiftyJSON
 
-var place: String = ""
+//var place: String = ""
 
 class ButtonDetailsTableViewControllerCell: UITableViewCell {
     @IBOutlet weak var placeButton: UIButton!
     @IBOutlet weak var buyTicketButton: UIButton!
-    @IBOutlet weak var favoriteButton: UIButton!
     @IBOutlet weak var LabelFullDetails: UILabel!
     @IBOutlet weak var LabelNameDetails: UILabel!
     @IBOutlet weak var LabelStartDetails: UILabel!
     @IBOutlet weak var LabelStopDetails: UILabel!
     @IBOutlet weak var LabelCost: UILabel!
+    
+    @IBAction func favoriteAction(_ sender: UIButton) {
+
+        print("RUN")
+    }
+    
 }
 
 class DetailsTableViewController: UITableViewController {
     
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
-    
     var idEvent: String = ""
     var searchId: String = ""
     
