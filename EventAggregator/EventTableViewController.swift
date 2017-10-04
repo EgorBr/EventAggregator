@@ -17,6 +17,7 @@ import SWRevealViewController
 class EventTableViewController: UITableViewController {
 
     @IBOutlet weak var menuButton: UIBarButtonItem!
+    @IBOutlet weak var categoriesButton: UIBarButtonItem!
     
     var city: String = uds.value(forKey: "city") as! String
     var nameEvent: [String] = []
@@ -44,6 +45,7 @@ class EventTableViewController: UITableViewController {
         tableView.addSubview(refresher)
         
         sideMenu()
+        rightMenu()
         customizeNavBar()
         
         self.navigationItem.title = uds.value(forKey: "city") as! String
@@ -103,7 +105,15 @@ class EventTableViewController: UITableViewController {
         if revealViewController() != nil {
             menuButton.target = revealViewController()
             menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
-            revealViewController().rearViewRevealWidth = 250
+            revealViewController().rearViewRevealWidth = 200
+            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+        }
+    }
+    func rightMenu() {
+        if revealViewController() != nil {
+            categoriesButton.target = revealViewController()
+            categoriesButton.action = #selector(SWRevealViewController.rightRevealToggle(_:))
+//            revealViewController().rearViewRevealWidth = -10
             view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
         }
     }

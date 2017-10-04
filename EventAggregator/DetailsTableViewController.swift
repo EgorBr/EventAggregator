@@ -21,9 +21,13 @@ class ButtonDetailsTableViewControllerCell: UITableViewCell {
     @IBOutlet weak var LabelStopDetails: UILabel!
     @IBOutlet weak var LabelCost: UILabel!
     
+    @IBOutlet weak var favoriteOutletButton: UIButton!
     @IBAction func favoriteAction(_ sender: UIButton) {
-
-        print("RUN")
+//        self.favoriteOutletButton.setImage(UIImage(named: "starSelected"), for: .normal)
+//        let alert = UIAlertController(title: "Error", message: "New city name is empty.", preferredStyle: .alert)
+//        let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
+//        alert.addAction(action)
+//        self.present(alert, animated: true, completion: nil)
     }
     
 }

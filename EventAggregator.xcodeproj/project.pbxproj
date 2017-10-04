@@ -31,6 +31,7 @@
 		F4B382B01F460993009EC8BE /* EventKudaGo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B382AF1F460993009EC8BE /* EventKudaGo.swift */; };
 		F4CA76531F4E271A0091083E /* SearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA76521F4E271A0091083E /* SearchTableViewController.swift */; };
 		F4D6B8EF1F22A60100A06996 /* Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D6B8EE1F22A60100A06996 /* Decoder.swift */; };
+		F4E5B0D91F82DD0100945FEE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4E5B0D81F82DD0100945FEE /* MapKit.framework */; };
 		F4EDDCA91F4F60C900444AD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */; };
 		F4EDDCAB1F4F63AA00444AD3 /* RootTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */; };
 /* End PBXBuildFile section */
@@ -64,6 +65,7 @@
 		F4B382AF1F460993009EC8BE /* EventKudaGo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventKudaGo.swift; sourceTree = "<group>"; };
 		F4CA76521F4E271A0091083E /* SearchTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableViewController.swift; sourceTree = "<group>"; };
 		F4D6B8EE1F22A60100A06996 /* Decoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decoder.swift; sourceTree = "<group>"; };
+		F4E5B0D81F82DD0100945FEE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -73,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4E5B0D91F82DD0100945FEE /* MapKit.framework in Frameworks */,
 				6CEDC05DCC40ABAD867456F6 /* Pods_EventAggregator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -83,6 +86,7 @@
 		07A3074E5A0703F0EB8FDA6C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F4E5B0D81F82DD0100945FEE /* MapKit.framework */,
 				017B0F8B1AA3DB5B3741EAA0 /* Pods_EventAggregator.framework */,
 			);
 			name = Frameworks;
@@ -210,6 +214,11 @@
 						DevelopmentTeam = 4NW94WU93C;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
