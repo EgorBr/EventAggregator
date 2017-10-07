@@ -16,7 +16,7 @@ class FavoriteTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        self.navigationItem.title = "Избранное"
         sideMenu()
         customizeNavBar()
         
@@ -32,7 +32,7 @@ class FavoriteTableViewController: UITableViewController {
             menuButton.target = revealViewController()
             menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
             revealViewController().rearViewRevealWidth = 250
-            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+            tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
     //Разрисовываем navigationBar

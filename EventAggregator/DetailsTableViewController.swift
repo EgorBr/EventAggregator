@@ -13,6 +13,7 @@ import SwiftyJSON
 //var place: String = ""
 
 class ButtonDetailsTableViewControllerCell: UITableViewCell {
+
     @IBOutlet weak var placeButton: UIButton!
     @IBOutlet weak var buyTicketButton: UIButton!
     @IBOutlet weak var LabelFullDetails: UILabel!
@@ -22,12 +23,9 @@ class ButtonDetailsTableViewControllerCell: UITableViewCell {
     @IBOutlet weak var LabelCost: UILabel!
     
     @IBOutlet weak var favoriteOutletButton: UIButton!
-    @IBAction func favoriteAction(_ sender: UIButton) {
-//        self.favoriteOutletButton.setImage(UIImage(named: "starSelected"), for: .normal)
-//        let alert = UIAlertController(title: "Error", message: "New city name is empty.", preferredStyle: .alert)
-//        let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
-//        alert.addAction(action)
-//        self.present(alert, animated: true, completion: nil)
+    @IBAction func favoriteAction(_ sender: AnyObject) {
+        self.favoriteOutletButton.setImage(UIImage(named: "starSelected"), for: .normal)
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showAlert"), object: nil)
     }
     
 }
@@ -56,9 +54,10 @@ class DetailsTableViewController: UITableViewController {
         self.tableView.estimatedRowHeight = 150
         self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(showAlert), name: NSNotification.Name(rawValue: "showAlert"), object: nil)
         // пришли из EventTableViewController и получаем инфу так
         if idEvent != "" {
-            //Получаем ID Мероприятия для звывода
+            //Получаем ID Мероприятия для вывода
             refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
                 if let keyValue = snapshot.value as? NSDictionary {
                     for getKey in keyValue.allKeys {
@@ -137,9 +136,11 @@ class DetailsTableViewController: UITableViewController {
 
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    func showAlert() {
+        let alert = UIAlertController(title: nil, message: "Добавленно в избранное", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
 
     // MARK: - Table view data source

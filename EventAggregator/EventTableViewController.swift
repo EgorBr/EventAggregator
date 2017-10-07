@@ -45,7 +45,7 @@ class EventTableViewController: UITableViewController {
         tableView.addSubview(refresher)
         
         sideMenu()
-        rightMenu()
+//        rightMenu()
         customizeNavBar()
         
         self.navigationItem.title = uds.value(forKey: "city") as! String
@@ -105,18 +105,22 @@ class EventTableViewController: UITableViewController {
         if revealViewController() != nil {
             menuButton.target = revealViewController()
             menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
-            revealViewController().rearViewRevealWidth = 200
-            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
-        }
-    }
-    func rightMenu() {
-        if revealViewController() != nil {
+            revealViewController().rearViewRevealWidth = 250
             categoriesButton.target = revealViewController()
             categoriesButton.action = #selector(SWRevealViewController.rightRevealToggle(_:))
-//            revealViewController().rearViewRevealWidth = -10
-            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+            revealViewController().rightViewRevealWidth = 300
+            tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
+//    func rightMenu() {
+//        if revealViewController() != nil {
+//            categoriesButton.target = revealViewController()
+//            categoriesButton.action = #selector(SWRevealViewController.rightRevealToggle(_:))
+//            revealViewController().rightViewRevealWidth = 300
+//            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+//        }
+//    }
+    
     //Разрисовываем navigationBar
     func customizeNavBar() {
         //Цвет кнопки меню

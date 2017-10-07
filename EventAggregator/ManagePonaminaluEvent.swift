@@ -101,4 +101,41 @@ class ManagePonaminaluEvent {
             }
         }
     }
+    
+    func manageCategory() {
+        Alamofire.request(self.urlPonaminalu+"v4/categories/list?session=\(apiKeyPonaminalu)", method: .get).validate().responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+                var tmpAlis: [String] = []
+                for (_, subJSON) in json["message"] {
+                    refCategory.observeSingleEvent(of: .value, with: {(snapshot) in
+                        if let keyVCategory = snapshot.value as? NSDictionary {
+                            for keyCat in keyVCategory.allKeys {
+                                refCategory.child(keyCat as! String).observeSingleEvent(of: .value, with: {(snapshot) in
+                                    if let alias = snapshot.value as? NSDictionary {
+                                        let name = alias["name"]  as? String ?? ""
+                                        if subJSON["title"].stringValue != name {
+                                            if tmpAlis.contains(subJSON["title"].stringValue) {}
+                                            else {
+                                                tmpAlis.append(subJSON["title"].stringValue)
+                                                let key = refCategory.childByAutoId().key
+                                                refCategory.child("\(key)/name").setValue(subJSON["title"].stringValue)
+                                                refCategory.child("\(key)/slug").setValue(subJSON["alias"].stringValue)
+                                                refCategory.child("\(key)/events_count").setValue(subJSON["events_count"].stringValue)
+                                            }
+                                        }
+//
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
 }

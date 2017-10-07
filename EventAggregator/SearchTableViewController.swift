@@ -49,7 +49,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     // поиск по ресурсу Ponaminalu
     func searchPonaminalu(txt: String) {
         if uds.value(forKey: "regionId") as! String != "" {
-            var txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+            let txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
             let url = "https://search.ponominalu.ru/search.php?q=\(txtUrl!)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488&format=json"
             Alamofire.request(url, method: .get).validate().responseJSON { response in
                 switch response.result {
@@ -69,17 +69,26 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     func searchKudago(txt: String) {
         if uds.value(forKey: "citySlug") as! String != "" {
             var txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
-            Alamofire.request("https://kudago.com/public-api/v1.3/search/?location=\(uds.value(forKey: "citySlug") as! String)&q=\(txtUrl!)", method: .get).validate().responseJSON { response in
-                switch response.result {
-                case .success(let value):
-                    let json = JSON(value)
-                    for (_, subJSON) in json["results"] {
-                        self.result.append(subJSON["title"].stringValue)
-                        self.resultId.append(subJSON["id"].stringValue)
-                        self.tableView.reloadData()
+            if txt.characters.count > 2 {
+                Alamofire.request("https://kudago.com/public-api/v1.3/search/?location=\(uds.value(forKey: "citySlug") as! String)&q=\(txtUrl!)", method: .get).validate().responseJSON { response in
+                    switch response.result {
+                    case .success(let value):
+                        let json = JSON(value)
+                        for (_, subJSON) in json["results"] {
+                            self.result.append(subJSON["title"].stringValue)
+                            self.resultId.append(subJSON["id"].stringValue)
+                            self.tableView.reloadData()
+                        }
+                    case .failure(let error):
+                        print(error)
+                        let alert = UIAlertController(title: "Упс! 🤦‍♂️ Ошибочка!", message: "Напиши пожалуйста нормальный текст. 😉", preferredStyle: .alert)
+                        let action = UIAlertAction(title: "Понял", style: .default) { (action) in
+                            self.searchController.searchBar.text! = ""
+                            txtUrl = nil
+                        }
+                        alert.addAction(action)
+                        self.present(alert, animated: true, completion: nil)
                     }
-                case .failure(let error):
-                    print(error)
                 }
             }
         }        
@@ -89,8 +98,8 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         if revealViewController() != nil {
             menuButtonTable.target = revealViewController()
             menuButtonTable.action = #selector(SWRevealViewController.revealToggle(_:))
-            revealViewController().rearViewRevealWidth = 275
-            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
+            revealViewController().rearViewRevealWidth = 250
+            tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
     

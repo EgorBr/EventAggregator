@@ -25,61 +25,6 @@ class ManageEventTimepad {
     
     var results = [String: String]()
     
-    func loadCity(){
-        
-        var idForCity: [String] = []
-        //Первый запрос для полчения ID мероприятий чтобы получил города
-        requestGroup.enter()
-        Alamofire.request(urlTimepadEvent+"?limit=100", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
-            switch response.result {
-            case .success(let value):
-                let json = JSON(value)
-                for (_, subJSON) in json["values"] {
-                    let id = subJSON["id"].stringValue
-                    idForCity.append(id)
-                }
-                
-            case .failure(let error):
-                print(error)
-            }
-            
-            // По полученным ID получаем название городов где будут проходить мероприятия
-            if response.result.isSuccess {
-                for (index, value) in idForCity.enumerated() {
-                    Alamofire.request(self.urlEvent+value, method: .get).validate().responseJSON(queue: concurrentQueue) { response in
-                        switch response.result {
-                        case .success(let value):
-                            let json = JSON(value)
-                            let insCity = CityEvent()
-                            let insTypeEvent = TypeEvent()
-                            insCity.name = json["location"]["city"].stringValue
-                            insTypeEvent.name = json["categories"][0]["name"].stringValue
-                            if insCity.name != "Без города" {
-                                let realm = try! Realm()
-                                try! realm.write {
-                                    realm.add(insTypeEvent, update: true)
-                                    realm.add(insCity, update: true)
-                                }
-                            }
-                            
-                            if idForCity.count == index+1 {
-//                                print("Notis")
-//                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "refresh"), object: nil)
-                                semafore.signal()
-                            }
-//                            
-                        case .failure(let error):
-                            print(error)
-                        }
-                    }
-                }
-            }
-            
-            self.requestGroup.leave()
-        }
-        return
-    }
-    
     func loadDB(param: Int) /*-> [String]*/ {
 //        var array: [String] = []
         let realm = try! Realm()

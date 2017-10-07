@@ -23,9 +23,10 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     
     var topKGImage: [String] = []
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+//        managePonaminalu.manageCategory()
+//        manageKudaGo.loadCategory()
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         //Очистака от старых эвентов и формарование массива актуальных мероприятий
         if uds.value(forKey: "city") != nil {
@@ -50,10 +51,14 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
 //            }
 //            
 //        })
-
-        sideMenu()
-        customizeNavBar()
-
+        // боковое меню
+        if revealViewController() != nil {
+            menuButton.target = revealViewController()
+            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
+            revealViewController().rearViewRevealWidth = 250
+            tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
+        }
+        
         print(Realm.Configuration.defaultConfiguration.fileURL!)
         //создаём отмтку первого запуска чтобы вести отчёт когда почистить события
         if uds.value(forKey: "lastLoad") == nil {
@@ -74,11 +79,13 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
         }
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    override func viewWillAppear(_ animated: Bool) {
+        //Цвет кнопок
+        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        //Цвет navigationBar
+        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
-
     
     func startUtils() {
         concurrentQueue.async(qos: .userInitiated) {
@@ -90,25 +97,6 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     func reloadKeyCity() {
         utils.getKeyCity(name: uds.value(forKey: "city") as! String) // получаем ключ города чтобы работать с ним
     }
-    
-    func sideMenu() {
-        if revealViewController() != nil {
-            menuButton.target = revealViewController()
-            menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
-            revealViewController().rearViewRevealWidth = 250
-            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
-        }
-    }
-    //Разрисовываем navigationBar
-    func customizeNavBar() {
-        //Цвет кнопки меню
-        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-        //Цвет navigationBar
-        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
-     }
-    
-
 }
 
 //class PonaminaluUICollectionViewCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource {

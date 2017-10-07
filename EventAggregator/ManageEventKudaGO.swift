@@ -134,22 +134,22 @@ class ManageEventKudaGO {
         }
     }
     
-//    func loadCategory() {
-//        Alamofire.request(self.urlKudaGO+"place-categories/?lang=ru", method: .get).validate().responseJSON { response in
-//            switch response.result {
-//            case .success(let value):
-//                let json = JSON(value)
-//                for (_, subJSON) in json {
-//                    print(subJSON)
-//                    let key = refCategory.childByAutoId().key
-//                    refCategory.child(key).child("name").setValue(subJSON["name"].stringValue)
-//                    refCategory.child(key).child("slug").setValue(subJSON["slug"].stringValue)
-//
-//                }
-//                
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-//    }    
+    func loadCategory() {
+        Alamofire.request(self.urlKudaGO+"place-categories/?lang=ru", method: .get).validate().responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+                for (_, subJSON) in json {
+                    print(subJSON)
+                    let key = refCategory.childByAutoId().key
+                    refCategory.child(key).child("name").setValue(subJSON["name"].stringValue)
+                    refCategory.child(key).child("slug").setValue(subJSON["slug"].stringValue)
+
+                }
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }    
 }

@@ -10,7 +10,9 @@
 		6CEDC05DCC40ABAD867456F6 /* Pods_EventAggregator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 017B0F8B1AA3DB5B3741EAA0 /* Pods_EventAggregator.framework */; };
 		F4133B5A1F7AC3B6000CC446 /* ShowPlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4133B591F7AC3B6000CC446 /* ShowPlaceViewController.swift */; };
 		F41D34A21F61BAE60041A6F0 /* ManagePonaminaluEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41D34A11F61BAE60041A6F0 /* ManagePonaminaluEvent.swift */; };
+		F43BBD141F89656E00419B85 /* EventMapLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43BBD131F89656E00419B85 /* EventMapLocationViewController.swift */; };
 		F45524031F1E891600AE1318 /* LoadDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45524021F1E891600AE1318 /* LoadDB.swift */; };
+		F473AE121F86E3A7008A4B63 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F473AE111F86E3A7008A4B63 /* CategoryTableViewController.swift */; };
 		F475B5D91F1D3AAD006ACA85 /* TypeEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F475B5D81F1D3AAD006ACA85 /* TypeEvent.swift */; };
 		F475B5DB1F1D3ACC006ACA85 /* CityEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = F475B5DA1F1D3ACC006ACA85 /* CityEvent.swift */; };
 		F476CBC91F1D38F7007349F5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F476CBC81F1D38F7007349F5 /* AppDelegate.swift */; };
@@ -30,6 +32,7 @@
 		F49BC8031F2A78D4002471A7 /* ManageEventKudaGO.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BC8021F2A78D4002471A7 /* ManageEventKudaGO.swift */; };
 		F4B382B01F460993009EC8BE /* EventKudaGo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B382AF1F460993009EC8BE /* EventKudaGo.swift */; };
 		F4CA76531F4E271A0091083E /* SearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA76521F4E271A0091083E /* SearchTableViewController.swift */; };
+		F4D43FC11F8916A2000FE8FC /* MapPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D43FC01F8916A2000FE8FC /* MapPin.swift */; };
 		F4D6B8EF1F22A60100A06996 /* Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D6B8EE1F22A60100A06996 /* Decoder.swift */; };
 		F4E5B0D91F82DD0100945FEE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4E5B0D81F82DD0100945FEE /* MapKit.framework */; };
 		F4EDDCA91F4F60C900444AD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */; };
@@ -42,7 +45,9 @@
 		481FD2D7A4D654D36D194888 /* Pods-EventAggregator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EventAggregator.release.xcconfig"; path = "Pods/Target Support Files/Pods-EventAggregator/Pods-EventAggregator.release.xcconfig"; sourceTree = "<group>"; };
 		F4133B591F7AC3B6000CC446 /* ShowPlaceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPlaceViewController.swift; sourceTree = "<group>"; };
 		F41D34A11F61BAE60041A6F0 /* ManagePonaminaluEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagePonaminaluEvent.swift; sourceTree = "<group>"; };
+		F43BBD131F89656E00419B85 /* EventMapLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMapLocationViewController.swift; sourceTree = "<group>"; };
 		F45524021F1E891600AE1318 /* LoadDB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadDB.swift; sourceTree = "<group>"; };
+		F473AE111F86E3A7008A4B63 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		F475B5D81F1D3AAD006ACA85 /* TypeEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeEvent.swift; sourceTree = "<group>"; };
 		F475B5DA1F1D3ACC006ACA85 /* CityEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CityEvent.swift; sourceTree = "<group>"; };
 		F476CBC51F1D38F7007349F5 /* EventAggregator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventAggregator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,6 +69,7 @@
 		F49BC8021F2A78D4002471A7 /* ManageEventKudaGO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManageEventKudaGO.swift; sourceTree = "<group>"; };
 		F4B382AF1F460993009EC8BE /* EventKudaGo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventKudaGo.swift; sourceTree = "<group>"; };
 		F4CA76521F4E271A0091083E /* SearchTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableViewController.swift; sourceTree = "<group>"; };
+		F4D43FC01F8916A2000FE8FC /* MapPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPin.swift; sourceTree = "<group>"; };
 		F4D6B8EE1F22A60100A06996 /* Decoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decoder.swift; sourceTree = "<group>"; };
 		F4E5B0D81F82DD0100945FEE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -144,6 +150,7 @@
 				F41D34A11F61BAE60041A6F0 /* ManagePonaminaluEvent.swift */,
 				F4D6B8EE1F22A60100A06996 /* Decoder.swift */,
 				F45524021F1E891600AE1318 /* LoadDB.swift */,
+				F4D43FC01F8916A2000FE8FC /* MapPin.swift */,
 			);
 			name = MangeData;
 			sourceTree = "<group>";
@@ -152,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				F4EDDCAA1F4F63AA00444AD3 /* RootTableViewController.swift */,
+				F473AE111F86E3A7008A4B63 /* CategoryTableViewController.swift */,
 				F488C1961F27BAB200FC76A4 /* EventTableViewController.swift */,
 				F488C19C1F27D6D600FC76A4 /* DetailsTableViewController.swift */,
 				F47D02691F51BC6400C3220B /* SettingsTableViewController.swift */,
@@ -159,6 +167,7 @@
 				F47D026D1F51BCDB00C3220B /* FavoriteTableViewController.swift */,
 				F4CA76521F4E271A0091083E /* SearchTableViewController.swift */,
 				F4133B591F7AC3B6000CC446 /* ShowPlaceViewController.swift */,
+				F43BBD131F89656E00419B85 /* EventMapLocationViewController.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -206,7 +215,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 0900;
 				ORGANIZATIONNAME = "Egor Bryzgalov";
 				TargetAttributes = {
 					F476CBC41F1D38F7007349F5 = {
@@ -341,7 +350,10 @@
 				F47D026E1F51BCDB00C3220B /* FavoriteTableViewController.swift in Sources */,
 				F4B382B01F460993009EC8BE /* EventKudaGo.swift in Sources */,
 				F4D6B8EF1F22A60100A06996 /* Decoder.swift in Sources */,
+				F4D43FC11F8916A2000FE8FC /* MapPin.swift in Sources */,
+				F43BBD141F89656E00419B85 /* EventMapLocationViewController.swift in Sources */,
 				F47D026A1F51BC6400C3220B /* SettingsTableViewController.swift in Sources */,
+				F473AE121F86E3A7008A4B63 /* CategoryTableViewController.swift in Sources */,
 				F4133B5A1F7AC3B6000CC446 /* ShowPlaceViewController.swift in Sources */,
 				F476CBE31F1D3A70007349F5 /* ManageEventTimepad.swift in Sources */,
 				F476CBE11F1D3A54007349F5 /* EventTickets.swift in Sources */,
@@ -383,7 +395,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -391,7 +405,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -434,7 +452,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -442,7 +462,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

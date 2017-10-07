@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 class ShowPlaceViewController: UIViewController {
 
@@ -16,8 +17,9 @@ class ShowPlaceViewController: UIViewController {
     @IBOutlet weak var subwayPlaceLabel: UILabel!
     @IBOutlet weak var cityPlaceLabel: UILabel!
     @IBOutlet weak var addressPlaceLabel: UILabel!
+    @IBOutlet weak var mapView: MKMapView!
     
-    var placeId: String = ""
+    var placeId: String = ""    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +31,8 @@ class ShowPlaceViewController: UIViewController {
                 self.phonePlaceLabel.text = place["phone"] as? String ?? ""
                 self.subwayPlaceLabel.text = place["subway"] as? String ?? ""
                 self.addressPlaceLabel.text = place["address"] as? String ?? ""
+                
+//                print(place["coords"]!)
                 if place["location"] as? String ?? "" == "" {
                     self.cityPlaceLabel.text = uds.value(forKey: "city") as! String
                 } else {
@@ -48,6 +52,20 @@ class ShowPlaceViewController: UIViewController {
                 }
             }
         })
+        refPlace.child("\(self.placeId)/coords").observeSingleEvent(of: .value, with: { (snaphot) in
+            if let coords = snaphot.value as? NSDictionary {
+                //Создаём точку на карте и задаём радиус отображения
+                let location = CLLocation(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                let radius: CLLocationDistance = 500
+                let point = MKCoordinateRegionMakeWithDistance(location.coordinate, radius, radius )
+                self.mapView.setRegion(point, animated: true)
+                //ставим булавку в указанном месте
+                let pin = CLLocationCoordinate2D(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                let setPin = MapPin(title: "", subtitle: "", coordinate: pin)
+                self.mapView.addAnnotation(setPin)
+            }
+        })
+        
     }
 
     override func didReceiveMemoryWarning() {
