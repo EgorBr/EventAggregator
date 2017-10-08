@@ -110,7 +110,6 @@ class ManageEventKudaGO {
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
-                print(idPlace)
                 refPlace.child("\(idPlace)/id").setValue(json["id"].stringValue)
                 refPlace.child("\(idPlace)/short_title").setValue(json["short_title"].stringValue)
                 refPlace.child("\(idPlace)/title").setValue(json["title"].stringValue)
@@ -135,7 +134,7 @@ class ManageEventKudaGO {
     }
     
     func loadCategory() {
-        Alamofire.request(self.urlKudaGO+"place-categories/?lang=ru", method: .get).validate().responseJSON { response in
+        Alamofire.request(self.urlKudaGO+"event-categories/?lang=ru", method: .get).validate().responseJSON { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)

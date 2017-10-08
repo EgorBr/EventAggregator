@@ -22,12 +22,12 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
     let utils: Utils = Utils()
     
     var topKGImage: [String] = []
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-//        managePonaminalu.manageCategory()
-//        manageKudaGo.loadCategory()
+        uds.set(true, forKey: "switchKudaGO")
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(checkAggregator), name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
         //Очистака от старых эвентов и формарование массива актуальных мероприятий
         if uds.value(forKey: "city") != nil {
             startUtils()
@@ -62,8 +62,13 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
         print(Realm.Configuration.defaultConfiguration.fileURL!)
         //создаём отмтку первого запуска чтобы вести отчёт когда почистить события
         if uds.value(forKey: "lastLoad") == nil {
-            uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
+            uds.set(0, forKey: "lastLoad")
         }
+    }
+    
+    
+    
+    func checkAggregator() {
         //проверяем какие агрегаторы включены и делаем по ним загрузку
         if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 28800 {
             if uds.bool(forKey: "switchKudaGO") == true {
@@ -78,15 +83,18 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
             uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
         }
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
+        var preferredStatusBarStyle: UIStatusBarStyle { return .lightContent }
         //Цвет кнопок
         navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
         navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
-    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     func startUtils() {
         concurrentQueue.async(qos: .userInitiated) {
             self.utils.removeEvent() // чистит старое

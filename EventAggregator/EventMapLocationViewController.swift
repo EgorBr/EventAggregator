@@ -10,15 +10,19 @@ import UIKit
 import MapKit
 import CoreLocation
 import SWRevealViewController
+import FirebaseDatabase
+import Firebase
 
 class EventMapLocationViewController: UIViewController, CLLocationManagerDelegate {
-
-    @IBOutlet weak var locationView: MKMapView!    
-    @IBOutlet weak var locMenuButton: UIBarButtonItem!
-    @IBAction func locationMeButton(_ sender: Any) {
-    }
     
     let location = CLLocationManager()
+
+    @IBOutlet weak var locationView: MKMapView!
+    @IBOutlet weak var locMenuButton: UIBarButtonItem!
+    @IBAction func locationMeButton(_ sender: Any) {
+        location.startUpdatingLocation() // запускает метод locationManager()
+//      locationView.setCenter(locationView.userLocation.coordinate, animated: true) //Независимо от масштаба ставит тебя в центр экрана
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +38,21 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
             view.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
         
+        refPlace.observe(.value, with: {(snapshot) in
+            for item in snapshot.children.allObjects as! [DataSnapshot] {
+                let namePlace = (item as AnyObject).childSnapshot(forPath: "title").value as! String
+                if (item as AnyObject).childSnapshot(forPath: "location").value as! String == uds.value(forKey: "citySlug") as! String {
+                    refPlace.child("\((item as AnyObject).childSnapshot(forPath: "id").value as! String)/coords").observeSingleEvent(of: .value, with: {(snapshot) in
+                        if let coords = snapshot.value as? NSDictionary {
+                            //ставим булавку в указанном месте
+                            let pin = CLLocationCoordinate2D(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                            let setPin = MapPin(title: namePlace, subtitle: "", coordinate: pin)
+                            self.locationView.addAnnotation(setPin)
+                        }
+                    })
+                }
+            }
+        })
         // Do any additional setup after loading the view.
     }
 
@@ -41,12 +60,16 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .default
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         //Цвет кнопок
+        
         navigationController?.navigationBar.tintColor = UIColor.black
+        navigationController?.navigationBar.barStyle = UIBarStyle.black
         //Цвет navigationBar
-//        navigationController?.navigationBar.barTintColor = UIColor.white
         self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         self.navigationController?.navigationBar.shadowImage = UIImage()
         self.navigationController?.navigationBar.isTranslucent = true
@@ -61,6 +84,8 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
         let region = MKCoordinateRegionMakeWithDistance((currentLoc?.coordinate)!, radius, radius)
         locationView.setRegion(region, animated: true)
         self.locationView.showsUserLocation = true
+        location.stopUpdatingLocation()
+
     }
     
 

@@ -62,6 +62,7 @@ class Utils {
                                 } else {
                                     uds.set("", forKey: "regionId")
                                 }
+                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
                                 self.getKeyEvents()
                                 
                             }
