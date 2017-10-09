@@ -23,6 +23,7 @@ class ShowPlaceViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true //Запускает индикатор загрузки
         //заполняем инфой о месте проведения
         refPlace.child(self.placeId).observeSingleEvent(of: .value, with: { (snapshot) in
             if let place = snapshot.value as? NSDictionary {
@@ -32,9 +33,9 @@ class ShowPlaceViewController: UIViewController {
                 self.subwayPlaceLabel.text = place["subway"] as? String ?? ""
                 self.addressPlaceLabel.text = place["address"] as? String ?? ""
                 
-//                print(place["coords"]!)
                 if place["location"] as? String ?? "" == "" {
                     self.cityPlaceLabel.text = uds.value(forKey: "city") as! String
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 } else {
                     refEvent.observeSingleEvent(of: .value, with: { (snapshot) in
                         if let keyValue = snapshot.value as? NSDictionary {
@@ -43,6 +44,7 @@ class ShowPlaceViewController: UIViewController {
                                     if let tmp = snapshot.value as? NSDictionary {
                                         if place["location"] as? String ?? "" == tmp["SLUG"] as? String ?? "" {
                                             self.cityPlaceLabel.text = tmp["NAME"] as? String ?? ""
+                                            UIApplication.shared.isNetworkActivityIndicatorVisible = false //останавливает индикатор загрузки
                                         }
                                     }
                                 })

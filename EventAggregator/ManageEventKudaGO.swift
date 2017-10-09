@@ -36,7 +36,8 @@ class ManageEventKudaGO {
     //загружаем мероприятия
     func loadEventKudaGO() {
         if uds.value(forKey: "citySlug") as! String != "" {
-            Alamofire.request(self.urlKudaGO+"events/?fields=id%2Cdates%2Cshort_title%2Cdescription%2Cis_free%2Ctitle%2Cbody_text%2Cplace%2Ccategories%2Cage_restriction%2Cimages%2Cparticipants%2Ctags&lang=ru&order_by=-publication_date&page_size=10&slug=\(uds.value(forKey: "citySlug") as! String)&text_format=text&page_size=100", method: .get).validate().responseJSON { response in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+            Alamofire.request(self.urlKudaGO+"events/?fields=id%2Cdates%2Cshort_title%2Cdescription%2Cis_free%2Ctitle%2Cbody_text%2Cplace%2Ccategories%2Cage_restriction%2Cimages%2Cparticipants%2Ctags&lang=ru&order_by=-publication_date&page_size=10&location=\(uds.value(forKey: "citySlug") as! String)&text_format=text&page_size=100", method: .get).validate().responseJSON { response in
                 switch response.result {
                 case .success(let value):
                     let json = JSON(value)
@@ -73,7 +74,7 @@ class ManageEventKudaGO {
                         }
                         
                     }
-                    
+//                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 case .failure(let error):
                     print("ERROR",error)
                 }
@@ -106,6 +107,7 @@ class ManageEventKudaGO {
     }
     //загружаем метсто проведения 
     func loadPlaces(idPlace: String) {
+        print(idPlace)
         Alamofire.request(self.urlKudaGO+"places/\(idPlace)/?lang=ru&text_format=text", method: .get).validate().responseJSON { response in
             switch response.result {
             case .success(let value):
@@ -129,6 +131,7 @@ class ManageEventKudaGO {
                 refPlace.child("\(idPlace)/coords/lon").setValue(json["coords"]["lon"].stringValue)
             case .failure(let error):
                 print(error)
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
         }
     }

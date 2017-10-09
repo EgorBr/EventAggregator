@@ -51,6 +51,7 @@ class DetailsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         self.tableView.estimatedRowHeight = 150
         self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
@@ -89,9 +90,20 @@ class DetailsTableViewController: UITableViewController {
                     self.idPlace = json["place"]["id"].stringValue
                     if self.idPlace != "" {
                         refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.value as? NSDictionary == nil {
+                                self.manageKudaGO.loadPlaces(idPlace: self.idPlace)
+                                refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
+                                    if let reloadPlace = snapshot.value as? NSDictionary {
+                                        self.place = reloadPlace["title"] as? String ?? ""
+                                        self.tableView.reloadData()
+                                        UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                                    }
+                                })
+                            }
                             if let snapPlace = snapshot.value as? NSDictionary {
                                 self.place = snapPlace["title"] as? String ?? ""
                                 self.tableView.reloadData()
+                                UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
                         })
                     }
@@ -119,14 +131,22 @@ class DetailsTableViewController: UITableViewController {
                 self.end = val["stop_event"] as? String ?? ""
                 if val["Target"] as? String ?? "" == "kudago" {
                     self.idPlace = val["place"] as? String ?? ""
-                    refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let snapPlace = snapshot.value as? NSDictionary {
-                            self.place = snapPlace["title"] as? String ?? ""
-                            self.tableView.reloadData()
-                        }
-                    })
+                    if self.idPlace != "" {
+                        refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.value as? NSDictionary == nil {
+                                self.manageKudaGO.loadPlaces(idPlace: self.idPlace)
+                                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                            }
+                            if let snapPlace = snapshot.value as? NSDictionary {
+                                self.place = snapPlace["title"] as? String ?? ""
+                                self.tableView.reloadData()
+                                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                            }
+                        })
+                    }
                 } else {
                     self.place = val["place"] as? String ?? ""
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
                 self.price = val["price"] as? String ?? ""
                 self.details = val["short_title"] as? String ?? ""

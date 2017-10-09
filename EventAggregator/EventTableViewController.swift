@@ -38,6 +38,7 @@ class EventTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         // обновление списка мерприятий свайпом вниз
         refresher = UIRefreshControl()
         refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
@@ -60,6 +61,7 @@ class EventTableViewController: UITableViewController {
     func load() {
         refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             for val in snapshot.children {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = true
                 if uds.bool(forKey: "switchPonaminalu") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
                         self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
@@ -88,6 +90,7 @@ class EventTableViewController: UITableViewController {
                     }
                 }
                 self.tableView.reloadData()
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
         })
         

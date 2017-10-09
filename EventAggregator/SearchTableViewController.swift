@@ -25,9 +25,23 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         customizeNavBar()
         //создаем searchController
         searchController = UISearchController(searchResultsController: nil)
-        tableView.tableHeaderView = searchController.searchBar
+//        tableView.tableHeaderView = searchController.searchBar
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.searchBar.placeholder = "Мы найдём для Вас ..."
+        if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
+            textfield.textColor = UIColor.black // Цвет текста в searchbar
+            if let backgroundview = textfield.subviews.first {
+                // задаём цвет фона searchbar
+                backgroundview.backgroundColor = UIColor.white
+                // делаем круглым searchbar
+                backgroundview.layer.cornerRadius = 9;
+                backgroundview.clipsToBounds = true;
+            }
+        }
+        self.navigationItem.titleView = searchController.searchBar
+        
     }
     
     override func didReceiveMemoryWarning() {
@@ -67,10 +81,11 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     }
     // поиск по ресурсу Кudago
     func searchKudago(txt: String) {
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
         if uds.value(forKey: "citySlug") as! String != "" {
             var txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
             if txt.characters.count > 2 {
-                Alamofire.request("https://kudago.com/public-api/v1.3/search/?location=\(uds.value(forKey: "citySlug") as! String)&q=\(txtUrl!)", method: .get).validate().responseJSON { response in
+                Alamofire.request("https://kudago.com/public-api/v1.3/search/?location=\(uds.value(forKey: "citySlug") as! String)&q=\(txtUrl!)&ctype=event", method: .get).validate().responseJSON { response in
                     switch response.result {
                     case .success(let value):
                         let json = JSON(value)
@@ -78,9 +93,11 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                             self.result.append(subJSON["title"].stringValue)
                             self.resultId.append(subJSON["id"].stringValue)
                             self.tableView.reloadData()
+                            UIApplication.shared.isNetworkActivityIndicatorVisible = false
                         }
                     case .failure(let error):
                         print(error)
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = false
                         let alert = UIAlertController(title: "Упс! 🤦‍♂️ Ошибочка!", message: "Напиши пожалуйста нормальный текст. 😉", preferredStyle: .alert)
                         let action = UIAlertAction(title: "Понял", style: .default) { (action) in
                             self.searchController.searchBar.text! = ""
@@ -90,8 +107,10 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                         self.present(alert, animated: true, completion: nil)
                     }
                 }
+            } else {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
-        }        
+        }
     }
     
     func sideMenu() {
@@ -122,7 +141,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     //Эти строки данными
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let searchCell = tableView.dequeueReusableCell(withIdentifier: "searchCell", for: indexPath)
-            searchCell.textLabel?.text = result[indexPath.row]
+        searchCell.textLabel?.text = result[indexPath.row]
         return searchCell
     }
     

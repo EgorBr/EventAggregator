@@ -26,6 +26,7 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         location.delegate = self
         location.desiredAccuracy = kCLLocationAccuracyBest
         location.requestWhenInUseAuthorization()
@@ -65,8 +66,8 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        UINavigationBar.appearance().barStyle = UIBarStyle.black
         //Цвет кнопок
-        
         navigationController?.navigationBar.tintColor = UIColor.black
         navigationController?.navigationBar.barStyle = UIBarStyle.black
         //Цвет navigationBar

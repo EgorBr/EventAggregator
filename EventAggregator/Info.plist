@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string> Нам нужно знать где Вы, чтобы подсказать где ближайшее мероприятие.</string>
+	<string>Нам нужно знать где Вы, чтобы подсказать где ближайшее мероприятие</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ru</string>
 	<key>CFBundleDisplayName</key>
