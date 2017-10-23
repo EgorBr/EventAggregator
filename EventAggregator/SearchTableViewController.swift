@@ -18,18 +18,26 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     
     var result: [String] = []
     var resultId: [String] = []
+    var target: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.title = "Быстрый поиск"
         sideMenu()
         customizeNavBar()
         //создаем searchController
         searchController = UISearchController(searchResultsController: nil)
-//        tableView.tableHeaderView = searchController.searchBar
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = "Мы найдём для Вас ..."
+//        searchController.searchBar.placeholder = "Мы найдём для Вас ..."
+        if #available(iOS 11.0, *) {
+            self.navigationItem.searchController = searchController
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationItem.hidesSearchBarWhenScrolling = false
+        } else {
+            self.navigationItem.titleView = searchController.searchBar
+            searchController.hidesNavigationBarDuringPresentation = false
+        }
         if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             textfield.textColor = UIColor.black // Цвет текста в searchbar
             if let backgroundview = textfield.subviews.first {
@@ -39,9 +47,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                 backgroundview.layer.cornerRadius = 9;
                 backgroundview.clipsToBounds = true;
             }
-        }
-        self.navigationItem.titleView = searchController.searchBar
-        
+        }        
     }
     
     override func didReceiveMemoryWarning() {
@@ -64,14 +70,17 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     func searchPonaminalu(txt: String) {
         if uds.value(forKey: "regionId") as! String != "" {
             let txtUrl = txt.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
-            let url = "https://search.ponominalu.ru/search.php?q=\(txtUrl!)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488&format=json"
+            let url = "https://api.cultserv.ru/v4/events/list/?session=\(apiKeyPonaminalu)&title=\(txtUrl!)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488"
             Alamofire.request(url, method: .get).validate().responseJSON { response in
                 switch response.result {
                 case .success(let value):
                     let json = JSON(value)
                     for (_, subJSON) in json["message"] {
-                        print(subJSON)
+                        self.result.append(subJSON["title"].stringValue)
+                        self.resultId.append(subJSON["subevents"][0]["id"].stringValue)
+                        self.target.append("ponaminalu")
                         self.tableView.reloadData()
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     }
                 case .failure(let error):
                     print(error)
@@ -92,6 +101,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                         for (_, subJSON) in json["results"] {
                             self.result.append(subJSON["title"].stringValue)
                             self.resultId.append(subJSON["id"].stringValue)
+                            self.target.append("kudago")
                             self.tableView.reloadData()
                             UIApplication.shared.isNetworkActivityIndicatorVisible = false
                         }
@@ -135,8 +145,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     }
     //Колчество показываемых строк в этой секции
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            return result.count
-
+        return result.count
     }
     //Эти строки данными
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -148,8 +157,9 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showSearch" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let destinationVC = segue.destination as! DetailsTableViewController
+                let destinationVC = segue.destination as! DetailsViewController
                 destinationVC.searchId = resultId[indexPath.row]
+                destinationVC.targetName = target[indexPath.row]
                 dismiss(animated: true, completion: nil)
             }
         }

@@ -10,6 +10,7 @@ import Foundation
 import RealmSwift
 
 class FavoriteEvent: Object {
+    dynamic var region: String = ""
     dynamic var id: String = ""
     
     override static func primaryKey() -> String? {

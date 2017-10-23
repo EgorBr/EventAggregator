@@ -27,6 +27,9 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        UIApplication.shared.keyWindow?.backgroundColor = UIColor.green
+        UINavigationBar.appearance().clipsToBounds = true
+        
         location.delegate = self
         location.desiredAccuracy = kCLLocationAccuracyBest
         location.requestWhenInUseAuthorization()
@@ -40,33 +43,34 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
         }
         
         refPlace.observe(.value, with: {(snapshot) in
-            for item in snapshot.children.allObjects as! [DataSnapshot] {
+            for item in snapshot.children {
+                if String(describing: (item as AnyObject).childSnapshot(forPath: "location").value!) != "<null>" {
                 let namePlace = (item as AnyObject).childSnapshot(forPath: "title").value as! String
-                if (item as AnyObject).childSnapshot(forPath: "location").value as! String == uds.value(forKey: "citySlug") as! String {
-                    refPlace.child("\((item as AnyObject).childSnapshot(forPath: "id").value as! String)/coords").observeSingleEvent(of: .value, with: {(snapshot) in
-                        if let coords = snapshot.value as? NSDictionary {
-                            //ставим булавку в указанном месте
-                            let pin = CLLocationCoordinate2D(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
-                            let setPin = MapPin(title: namePlace, subtitle: "", coordinate: pin)
-                            self.locationView.addAnnotation(setPin)
-                        }
-                    })
+                    if uds.value(forKey: "citySlug") as! String == (item as AnyObject).childSnapshot(forPath: "location").value as! String  {
+                        refPlace.child("\((item as AnyObject).childSnapshot(forPath: "id").value as! String)/coords").observeSingleEvent(of: .value, with: {(snapshot) in
+                            if let coords = snapshot.value as? NSDictionary {
+                                //ставим булавку в указанном месте
+                                let pin = CLLocationCoordinate2D(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                                let setPin = MapPin(title: namePlace, subtitle: "", coordinate: pin)
+                                
+                                self.locationView.addAnnotation(setPin)
+                            }
+                        })
+                    }
                 }
             }
         })
         // Do any additional setup after loading the view.
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .default
-    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
-        UINavigationBar.appearance().barStyle = UIBarStyle.black
+//        UINavigationBar.appearance().barStyle = UIBarStyle.black
         //Цвет кнопок
         navigationController?.navigationBar.tintColor = UIColor.black
         navigationController?.navigationBar.barStyle = UIBarStyle.black
@@ -88,7 +92,6 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
         location.stopUpdatingLocation()
 
     }
-    
 
     /*
     // MARK: - Navigation

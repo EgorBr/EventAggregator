@@ -20,15 +20,17 @@ class EventTableViewController: UITableViewController {
     @IBOutlet weak var categoriesButton: UIBarButtonItem!
     
     var city: String = uds.value(forKey: "city") as! String
+    
+    var categoryName: String = ""
+
     var nameEvent: [String] = []
     var eventDescription: [String] = []
     var startEventTime: [String] = []
     var id: [String] = []
     var isFree: [String] = []
-//    var indexEv: [String] = []
+    var category: String = ""
     
     var refresher: UIRefreshControl!
-    
     
     let loadDB: LoadDB = LoadDB()
     let manageTimepad: ManageEventTimepad = ManageEventTimepad()
@@ -38,50 +40,66 @@ class EventTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if category == "" {
+            self.navigationItem.title = uds.value(forKey: "city") as! String
+        } else {
+            self.navigationItem.title = "\(uds.value(forKey: "city") as! String). \(category)"
+        }
+        self.tableView.estimatedRowHeight = 15
+        self.tableView.rowHeight = UITableViewAutomaticDimension
+        sideMenu()
+        customizeNavBar()
+        if categoryName != "" {
+            if categoryName != categoryName {
+                loadEventIntoCategories()
+            } else {
+                self.tableView.reloadData()
+            }
+        } else {
+            loadAllEvent()
+        }
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         // обновление списка мерприятий свайпом вниз
         refresher = UIRefreshControl()
         refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        refresher.addTarget(self, action: #selector(load), for: UIControlEvents.valueChanged)
+        refresher.addTarget(self, action: #selector(loadAllEvent), for: UIControlEvents.valueChanged)
         tableView.addSubview(refresher)
-        
-        sideMenu()
-//        rightMenu()
-        customizeNavBar()
-        
-        self.navigationItem.title = uds.value(forKey: "city") as! String
-        
-        self.tableView.estimatedRowHeight = 15
-        self.tableView.rowHeight = UITableViewAutomaticDimension
-            
-        load()
-    
     }
+    
     // выводим краткую инфу по мероприятиям в зависимости отквключенных агрегаторов
-    func load() {
+    func loadAllEvent() {
+        nameEvent = []
+        eventDescription = []
+        startEventTime = []
+        id = []
+        isFree = []
         refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
             for val in snapshot.children {
-                UIApplication.shared.isNetworkActivityIndicatorVisible = true
                 if uds.bool(forKey: "switchPonaminalu") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = true
                         self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
                         self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
                         self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
                         self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
                         self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        self.tableView.reloadData()
                     }
                 }
                 if uds.bool(forKey: "switchKudaGO") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "kudago" {
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = true
                         self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
                         self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
                         self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
                         self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
                         self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        self.tableView.reloadData()
                     }
                 }
                 if uds.bool(forKey: "switchTimaPad") == true {
                     if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "timapad" {
+                        UIApplication.shared.isNetworkActivityIndicatorVisible = true
                         self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
                         self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
                         self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
@@ -89,8 +107,8 @@ class EventTableViewController: UITableViewController {
                         self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
                     }
                 }
-                self.tableView.reloadData()
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                self.tableView.reloadData()
             }
         })
         
@@ -104,6 +122,52 @@ class EventTableViewController: UITableViewController {
 //        }
     }
     
+    func loadEventIntoCategories() {
+        nameEvent = []
+        eventDescription = []
+        startEventTime = []
+        id = []
+        isFree = []
+        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+            for val in snapshot.children {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = true
+                if (val as AnyObject).childSnapshot(forPath: "categories").value as! String == self.categoryName {
+                    if uds.bool(forKey: "switchPonaminalu") == true {
+                        if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "ponaminalu" {
+                            self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                            self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                            self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                            self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                            self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                            self.tableView.reloadData()
+                        }
+                    }
+                    if uds.bool(forKey: "switchKudaGO") == true {
+                        if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "kudago" {
+                            self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                            self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                            self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                            self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                            self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        }
+                    }
+                    if uds.bool(forKey: "switchTimaPad") == true {
+                        if (val as AnyObject).childSnapshot(forPath: "Target").value as! String == "timapad" {
+                            self.nameEvent.append((val as AnyObject).childSnapshot(forPath: "short_title").value as! String)
+                            self.id.append((val as AnyObject).childSnapshot(forPath: "id").value as! String)
+                            self.eventDescription.append((val as AnyObject).childSnapshot(forPath: "description").value as! String)
+                            self.startEventTime.append((val as AnyObject).childSnapshot(forPath: "start_event").value as! String)
+                            self.isFree.append((val as AnyObject).childSnapshot(forPath: "is_free").value as! String)
+                        }
+                    }
+                }
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                self.tableView.reloadData()
+                    
+            }
+        })
+    }
+    
     func sideMenu() {
         if revealViewController() != nil {
             menuButton.target = revealViewController()
@@ -115,18 +179,13 @@ class EventTableViewController: UITableViewController {
             tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
-//    func rightMenu() {
-//        if revealViewController() != nil {
-//            categoriesButton.target = revealViewController()
-//            categoriesButton.action = #selector(SWRevealViewController.rightRevealToggle(_:))
-//            revealViewController().rightViewRevealWidth = 300
-//            view.addGestureRecognizer(self.revealViewController().panGestureRecognizer())
-//        }
-//    }
     
     //Разрисовываем navigationBar
     func customizeNavBar() {
         //Цвет кнопки меню
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        } 
         navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
         navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
@@ -168,7 +227,7 @@ class EventTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detailsEvent" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let destinationVC = segue.destination as! DetailsTableViewController
+                let destinationVC = segue.destination as! DetailsViewController
                 destinationVC.idEvent = id[indexPath.row]
             }
         }

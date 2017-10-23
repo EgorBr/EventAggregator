@@ -18,14 +18,15 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationItem.title = "Ваш город"
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         //делаем поиск
         searchController = UISearchController(searchResultsController: nil)
-//        tableView.tableHeaderView = searchController.searchBar
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
+        self.navigationItem.titleView = searchController.searchBar
         searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.placeholder = "Ваш город ..."
+
         if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             textfield.textColor = UIColor.black // Цвет текста в searchbar
             if let backgroundview = textfield.subviews.first {
@@ -36,22 +37,16 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
                 backgroundview.clipsToBounds = true;
             }
         }
-        self.navigationItem.titleView = searchController.searchBar
         
         //заполняем массив с городами
         refEvent.observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKey in keyValue.allKeys {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = true
-                    refEvent.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let tmpName = snapshot.value as? NSDictionary {
-                            let subtmpname = tmpName["NAME"] as? String ?? ""
-                            self.sityList.append(subtmpname)
-                            self.sortCity = self.sityList.sorted(by: < )
-                            self.tableView.reloadData()
-                            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-                        }
-                    })
+                    self.sityList.append(getKey as! String)
+                    self.sortCity = self.sityList.sorted(by: < )
+                    self.tableView.reloadData()
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
             }
         })

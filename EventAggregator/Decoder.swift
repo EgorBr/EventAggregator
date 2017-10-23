@@ -44,23 +44,32 @@ class Decoder {
     }
     //изменяем формат даты yyyy-MM-dd'T'HH:mm:ss -> dd.MM.yyyy HH:mm
     func dfPonam(date: String!) -> String {
-        let deFormatter = DateFormatter()
-        deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-        let startTime = deFormatter.date(from: date)
+        if date != "" {
+            let deFormatter = DateFormatter()
+            deFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+            let startTime = deFormatter.date(from: date)
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy HH:mm"
-        let timeString = formatter.string(from: startTime!)
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy HH:mm"
+            let timeString = formatter.string(from: startTime!)
+            return timeString
+        } else {
+            return "-"
+        }
         
-        return timeString
+        
     }
     //переводим из секунд в dd.MM.yyyy HH:mm
     func timeConvert(sec: String) -> String {
-        let seconds = NSDate(timeIntervalSince1970: Double(sec)!)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy HH:mm"
-        let time = formatter.string(from: seconds as Date)
-        return time
+        if sec != "" {
+            let seconds = NSDate(timeIntervalSince1970: Double(sec)!)
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy HH:mm"
+            let time = formatter.string(from: seconds as Date)
+            return time
+        } else {
+            return "-"
+        }
     }
     // переводим dd.MM.yyyy HH:mm -> СЕК
     func timeConvertToSec(startTime: String) -> Int {

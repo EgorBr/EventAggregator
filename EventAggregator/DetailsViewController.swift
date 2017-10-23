@@ -9,53 +9,62 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
+import RealmSwift
 
-//var place: String = ""
-
-class ButtonDetailsTableViewControllerCell: UITableViewCell {
-
-    @IBOutlet weak var placeButton: UIButton!
-    @IBOutlet weak var buyTicketButton: UIButton!
-    @IBOutlet weak var LabelFullDetails: UILabel!
-    @IBOutlet weak var LabelNameDetails: UILabel!
-    @IBOutlet weak var LabelStartDetails: UILabel!
-    @IBOutlet weak var LabelStopDetails: UILabel!
-    @IBOutlet weak var LabelCost: UILabel!
+class DetailsViewController: UIViewController {
+    
+    let realm = try! Realm()
+    
+    @IBOutlet weak var imageEvent: UIImageView!
+    @IBOutlet weak var place: UIButton!
+    @IBOutlet weak var buyTicketB: UIButton!
+    @IBOutlet weak var fullDescription: UILabel!
+    @IBOutlet weak var nameDetails: UILabel!
+    @IBOutlet weak var startEvent: UILabel!
+    @IBOutlet weak var stopEvent: UILabel!
+    @IBOutlet weak var cost: UILabel!
     
     @IBOutlet weak var favoriteOutletButton: UIButton!
     @IBAction func favoriteAction(_ sender: AnyObject) {
+        let favorite = FavoriteEvent()
+        favorite.id = "idEvent"
+        favorite.region = uds.value(forKey: "city") as! String
+        try! realm.write {
+            print(favorite)
+            //            realm.add(favorite)
+        }
+        if 1 == 1 {
+            
+        } else {
+            
+        }
         self.favoriteOutletButton.setImage(UIImage(named: "starSelected"), for: .normal)
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: "showAlert"), object: nil)
     }
-    
-}
 
-class DetailsTableViewController: UITableViewController {
-    
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
+    
     var idEvent: String = ""
     var searchId: String = ""
+    var targetName: String = ""
     
-    var name: String = ""
-    var details: String = ""
-    var fullDetails: String = ""
-    var start: String = ""
-    var end: String = ""
-    var org: String = ""
-    var img: String = ""
     var eventKey: String = ""
-    var price: String = ""
-    var place: String = ""
     var idPlace: String = ""
+    var seo: String = ""
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .never
+        } 
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        self.tableView.estimatedRowHeight = 150
-        self.tableView.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(showAlert), name: NSNotification.Name(rawValue: "showAlert"), object: nil)
+        fullDescription.sizeToFit()
+        nameDetails.sizeToFit()
+        print(Realm.Configuration.defaultConfiguration.fileURL!)
         // пришли из EventTableViewController и получаем инфу так
         if idEvent != "" {
             //Получаем ID Мероприятия для вывода
@@ -76,17 +85,23 @@ class DetailsTableViewController: UITableViewController {
                     }
                 }
             })
-        } else { // если пришли из поиска чтобы посмотреть инфу по мероприятию
+        } else if targetName == "kudago" { // если пришли из поиска чтобы посмотреть инфу по мероприятию
             Alamofire.request("https://kudago.com/public-api/v1.3/events/\(searchId)/?text_format=text&location=\(uds.value(forKey: "citySlug") as! String)", method: .get).validate().responseJSON { response in
                 switch response.result {
                 case .success(let value):
                     let json = JSON(value)
-                    self.name = json["title"].stringValue
-                    self.fullDetails = json["body_text"].stringValue
-                    self.price = json["price"].stringValue
-                    self.start = Decoder().timeConvert(sec: json["dates"][0]["start"].stringValue)
-                    self.end = Decoder().timeConvert(sec: json["dates"][0]["end"].stringValue)
-                    self.img = json["images"][0]["image"].stringValue
+                    self.nameDetails.text = json["title"].stringValue
+                    self.fullDescription.text = json["body_text"].stringValue
+                    self.cost.text = json["price"].stringValue
+                    self.startEvent.text = Decoder().timeConvert(sec: json["dates"][0]["start"].stringValue)
+                    self.stopEvent.text = Decoder().timeConvert(sec: json["dates"][0]["end"].stringValue)
+                    if json["images"][0]["image"].stringValue != "" {
+                        let imgURL: NSURL = NSURL(string: json["images"][0]["image"].stringValue)!
+//                        print(imgURL)
+                        let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+                        let image: UIImageView = self.imageEvent
+                        image.image = UIImage(data: imgData as Data)
+                    }
                     self.idPlace = json["place"]["id"].stringValue
                     if self.idPlace != "" {
                         refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -94,41 +109,63 @@ class DetailsTableViewController: UITableViewController {
                                 self.manageKudaGO.loadPlaces(idPlace: self.idPlace)
                                 refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
                                     if let reloadPlace = snapshot.value as? NSDictionary {
-                                        self.place = reloadPlace["title"] as? String ?? ""
-                                        self.tableView.reloadData()
+                                        self.place.setTitle(reloadPlace["title"] as? String ?? "", for: .normal)
                                         UIApplication.shared.isNetworkActivityIndicatorVisible = false
                                     }
                                 })
                             }
                             if let snapPlace = snapshot.value as? NSDictionary {
-                                self.place = snapPlace["title"] as? String ?? ""
-                                self.tableView.reloadData()
+                                self.place .setTitle(snapPlace["title"] as? String ?? "", for: .normal) 
                                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
                         })
                     }
-                    self.tableView.reloadData()
+                case .failure(let error):
+                    print(error)
+                }
+            }
+        } else if targetName == "ponaminalu" {
+            Alamofire.request("https://api.cultserv.ru/v4/subevents/get/?session=\(apiKeyPonaminalu)&id=\(searchId)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488", method: .get).validate().responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    let json = JSON(value)
+                    if json["code"].stringValue == "1" {
+                    self.nameDetails.text = json["message"]["title"].stringValue
+                    self.fullDescription.text = json["message"]["description"].stringValue
+                    self.cost.text = "от \(json["message"]["min_price"].stringValue) до \(json["message"]["max_price"].stringValue)"
+                    self.startEvent.text = Decoder().dfPonam(date: json["message"]["date"].stringValue)
+                    self.stopEvent.text = "Уточняйте"
+                    self.seo = json["message"]["event"]["seo"]["alias"].stringValue
+//                    if json["images"][0]["image"].stringValue != "" {
+                        let imgURL: NSURL = NSURL(string: "http://media.cultserv.ru/i/300x200/\(json["message"]["image"].stringValue)")!
+                        let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+                        let image: UIImageView = self.imageEvent
+                        image.image = UIImage(data: imgData as Data)
+                    } else {
+                        self.fullDescription.text = "ПОТРАЧЕНО! БОЛЬШЕ НЕТ БИЛЕТОВ"
+                    }
+                
                 case .failure(let error):
                     print(error)
                 }
             }
         }
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
     func loadData() { //заполняем вьюху
         refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(eventKey).observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
-                self.name = val["title"] as? String ?? ""
-                self.fullDetails = val["description"] as? String ?? ""
-                self.img = val["image"] as? String ?? ""
-                self.start = val["start_event"] as? String ?? ""
-                self.end = val["stop_event"] as? String ?? ""
+                self.nameDetails.text = val["title"] as? String ?? ""
+                self.fullDescription.text = val["description"] as? String ?? ""
+                if val["image"] as? String ?? "" != "" {
+                    let imgURL: NSURL = NSURL(string: val["image"] as? String ?? "")!
+                    let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+                    let image: UIImageView = self.imageEvent
+                    image.image = UIImage(data: imgData as Data)
+                }
+                self.startEvent.text = val["start_event"] as? String ?? ""
+                self.stopEvent.text = val["stop_event"] as? String ?? ""
+                self.seo = val["seo"] as? String ?? ""
                 if val["Target"] as? String ?? "" == "kudago" {
                     self.idPlace = val["place"] as? String ?? ""
                     if self.idPlace != "" {
@@ -138,20 +175,18 @@ class DetailsTableViewController: UITableViewController {
                                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
                             if let snapPlace = snapshot.value as? NSDictionary {
-                                self.place = snapPlace["title"] as? String ?? ""
-                                self.tableView.reloadData()
+                                self.place.setTitle(snapPlace["title"] as? String ?? "", for: .normal)
                                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
                         })
                     }
                 } else {
-                    self.place = val["place"] as? String ?? ""
+                    self.place.setTitle(val["place"] as? String ?? "", for: .normal)
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
-                self.price = val["price"] as? String ?? ""
-                self.details = val["short_title"] as? String ?? ""
+                self.cost.text = val["price"] as? String ?? ""
+                self.fullDescription.text = val["short_title"] as? String ?? ""
             }
-            self.tableView.reloadData()
         })
 
     }
@@ -162,61 +197,17 @@ class DetailsTableViewController: UITableViewController {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
-
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 1
-    }
-
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let detailsCell = tableView.dequeueReusableCell(withIdentifier: "detailsCell", for: indexPath) as! ButtonDetailsTableViewControllerCell
-        
-        if img != "" {
-                let imgURL: NSURL = NSURL(string: self.img)!
-                let imgData: NSData = NSData(contentsOf: imgURL as URL)!
-                let image: UIImageView = detailsCell.viewWithTag(8) as! UIImageView
-                image.image = UIImage(data: imgData as Data)
-        }
-
-        detailsCell.LabelNameDetails.text = self.name
-        detailsCell.placeButton.setTitle(place, for: .normal)
-        detailsCell.LabelStartDetails.text = self.start
-
-        if fullDetails == "" {
-            detailsCell.LabelFullDetails.text = self.details
-        } else {
-            detailsCell.LabelFullDetails.text = self.fullDetails
-        }
-
-        if end != "" {
-            detailsCell.LabelStopDetails.text = end
-        } else {
-            detailsCell.LabelStopDetails.text = ""
-        }
-
-        if price != "" {
-            detailsCell.LabelCost.text = self.price
-        } else {
-            detailsCell.LabelCost.text = "Уточняйте в месте проведения"
-        }
-
-        return detailsCell
-    }
  
     //Идём смотреть инфу по месту проведения
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "place" {
-            let destinationVC = segue.destination as! ShowPlaceViewController
-            destinationVC.placeId = idPlace
-            
+            let placeVC = segue.destination as! ShowPlaceViewController
+            placeVC.placeId = idPlace
+        }
+        if segue.identifier == "buyTicket" {
+            let seq = segue.destination as! UINavigationController
+            let buyVC = seq.topViewController as! BuyWebViewController
+            buyVC.event = seo
         }
     }
     

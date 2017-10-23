@@ -13,14 +13,14 @@ import FirebaseDatabase
 class LoadDB {
     
     func CityName() -> [String]{
-        var arrCityName: [String] = []
+        var favoriteId: [String] = []
         let realm = try! Realm()
-        let valueCityName = realm.objects(CityEvent.self)
+        let valueCityName = realm.objects(FavoriteEvent.self)
         for value in valueCityName {
-            arrCityName.append(value.name)
+            favoriteId.append(value.id)
         }
         
-        return arrCityName
+        return favoriteId
         
     }
     //загружаем эвенты

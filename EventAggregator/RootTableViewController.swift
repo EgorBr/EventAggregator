@@ -7,82 +7,55 @@
 //
 
 import UIKit
-import RealmSwift
+import Alamofire
+import SwiftyJSON
 import SWRevealViewController
+import FirebaseDatabase
+import Firebase
 
 
-class RootTableViewController: UITableViewController//, UICollectionViewDelegate, UICollectionViewDataSource 
-{
-    
+class RootViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource {
+
     @IBOutlet weak var menuButton: UIBarButtonItem!
+    @IBOutlet weak var showTop: UICollectionView!
+    @IBOutlet weak var showNews: UITableView!
     
     let manageTimepad: ManageEventTimepad = ManageEventTimepad()
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
     let managePonaminalu: ManagePonaminaluEvent = ManagePonaminaluEvent()
     let utils: Utils = Utils()
     
-    var topKGImage: [String] = []
-
+    var idCellNews: [String] = []
+    var titleCellNews: [String] = []
+    var descriptionCellNews: [String] = []
+    var imgCellNews: [String] = []
+    
+    var idTopEvent: [String] = []
+    var imgTopEvent: [String] = []
+    var seoTopEvent: [String] = []
+    var nameTopEvent: [String] = []
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        uds.set(true, forKey: "switchKudaGO")
-        NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(checkAggregator), name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
-        //Очистака от старых эвентов и формарование массива актуальных мероприятий
-        if uds.value(forKey: "city") != nil {
-            startUtils()
-        }
-        //При первой загрузке задаётся город
-        if uds.value(forKey: "city") == nil {
-            uds.set("Москва", forKey: "city")
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        }
-//        manageKudaGo.eventsOfTheDays()
+        self.showNews.estimatedRowHeight = 15
+        self.showNews.rowHeight = UITableViewAutomaticDimension
+        loadNews()
+        showTopEvent()
+        self.navigationItem.title = "Лучшее"
         
-        
-//        ref.child("Top/KudaGo/\(uds.value(forKey: "cityKey") as! String)").observeSingleEvent(of: .value, with: { (snapshot) in
-//            for item in 0 ... snapshot.childrenCount {
-//                ref.child("Top/KudaGo/\(uds.value(forKey: "cityKey") as! String)/\(item)").observeSingleEvent(of: .value, with: { (snapshot) in
-//                    if let value = snapshot.value as? NSDictionary {
-//                        print(value["image"] as? String ?? "")
-//                        self.topKGImage.append(value["image"] as? String ?? "")
-//                    }
-//                })
-//            }
-//            
-//        })
         // боковое меню
         if revealViewController() != nil {
             menuButton.target = revealViewController()
             menuButton.action = #selector(SWRevealViewController.revealToggle(_:))
             revealViewController().rearViewRevealWidth = 250
-            tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
+            view.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
         
-        print(Realm.Configuration.defaultConfiguration.fileURL!)
-        //создаём отмтку первого запуска чтобы вести отчёт когда почистить события
-        if uds.value(forKey: "lastLoad") == nil {
-            uds.set(0, forKey: "lastLoad")
-        }
     }
+        
     
-    
-    
-    func checkAggregator() {
-        //проверяем какие агрегаторы включены и делаем по ним загрузку
-        if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 28800 {
-            if uds.bool(forKey: "switchKudaGO") == true {
-                manageKudaGo.loadEventKudaGO()
-            }
-            if uds.bool(forKey: "switchPonaminalu") == true {
-                managePonaminalu.loadEventPonaminalu()
-            }
-            if uds.bool(forKey: "switchTimaPad") == true {
-                print("TimePad is ON")
-            }
-            uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
-        }
-    }
     
     override func viewWillAppear(_ animated: Bool) {
         var preferredStatusBarStyle: UIStatusBarStyle { return .lightContent }
@@ -92,56 +65,105 @@ class RootTableViewController: UITableViewController//, UICollectionViewDelegate
         navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
+    
+    /*-------------------------*COLLECTION VIEW*-------------------------*/
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return idTopEvent.count
     }
-    func startUtils() {
-        concurrentQueue.async(qos: .userInitiated) {
-            self.utils.removeEvent() // чистит старое
-            self.utils.getKeyEvents() // делаем список актуальных
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let hotCell = collectionView.dequeueReusableCell(withReuseIdentifier: "hotCell", for: indexPath) as! HotCellCollectionViewControllerCell
+//        hotCell.hotName.text = nameTopEvent[indexPath.row]
+        backQueue.async {
+            let imgURL: NSURL = NSURL(string: self.imgTopEvent[indexPath.row])!
+            let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+            let image: UIImageView = hotCell.topEvent
+            DispatchQueue.main.async {
+                image.image = UIImage(data: imgData as Data)
+            }
+        }
+        return hotCell
+    }
+    /*-------------------------*COLLECTION VIEW*-------------------------*/
+                        //-//-//-//-//-//-//-//-//-//-//
+    /*----------------------------*TABLE VIEW*---------------------------*/
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return idCellNews.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let newsCell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as! NewsCellTableViewControllerCell
+        newsCell.titleNews.text = self.titleCellNews[indexPath.row]
+        newsCell.descriptionNews.text = self.descriptionCellNews[indexPath.row]
+        backQueue.async {
+            let imgURL: NSURL = NSURL(string: self.imgCellNews[indexPath.row])!
+            let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+            let image: UIImageView = newsCell.picNews
+            DispatchQueue.main.async {
+                image.image = UIImage(data: imgData as Data)
+            }
+        }
+        return newsCell
+    }
+    /*----------------------------*TABLE VIEW*---------------------------*/
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "newsDetails" {
+            if let indexPath = showNews.indexPathForSelectedRow {
+                let destinationVC = segue.destination as! NewsDetailsViewController
+                destinationVC.idNews = idCellNews[indexPath.row]
+            }
+        }
+//        if segue.identifier == "topDetails" {
+//            if let indexPath = showTop.indexPathsForSelectedItems {
+//                let destinationVC = segue.destination as! DetailsViewController
+//                destinationVC.searchId = idTopEvent[indexPath.i]
+//            }
+//        }
+    }
+    
+    func loadNews() {
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        Alamofire.request("https://kudago.com/public-api/v1.2/news/?fields=id,title,description,images&order_by=-publication_date&text_format=text&location=\(uds.value(forKey: "citySlug") as! String)", method: .get).validate().responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+                for (_, value) in json["results"] {
+                    self.idCellNews.append(value["id"].stringValue)
+                    self.titleCellNews.append(value["title"].stringValue)
+                    self.descriptionCellNews.append(value["description"].stringValue)
+                    self.imgCellNews.append(value["images"][0]["image"].stringValue)
+                    self.showNews.reloadData()
+                }
+            case .failure(let error):
+                print(error)
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
         }
     }
     
-    func reloadKeyCity() {
-        utils.getKeyCity(name: uds.value(forKey: "city") as! String) // получаем ключ города чтобы работать с ним
+    func showTopEvent() {
+        refTop.observeSingleEvent(of: .value, with: { (snapshot) in
+            if let topItem = snapshot.children.allObjects as? [DataSnapshot] {
+                for item in topItem {
+                    self.idTopEvent.append(String(describing: item.childSnapshot(forPath: "id").value!))
+                    self.seoTopEvent.append(String(describing: item.childSnapshot(forPath: "seo").value!))
+                    self.imgTopEvent.append(String(describing: item.childSnapshot(forPath: "img").value!))
+                    self.nameTopEvent.append(String(describing: item.childSnapshot(forPath: "title").value!))
+                    self.showTop.reloadData()
+                }
+                
+            }
+        })
     }
 }
 
-//class PonaminaluUICollectionViewCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
-//    
-//    
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return 1
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return 2
-//        
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cellPonaminalu = collectionView.dequeueReusableCell(withReuseIdentifier: "cellPonaminalu", for: indexPath) as! PonaminaluUICollectionViewCell
-//        
-//        
-//        return cellPonaminalu
-//    }
-//}
-//
-//class KudaGoUICollectionViewCell: UICollectionViewCell, UICollectionViewDelegate, UICollectionViewDataSource {
-//
-//    func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        return 1
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        return 4
-//        
-//    }
-//    
-//    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        let cellKudaGo = collectionView.dequeueReusableCell(withReuseIdentifier: "cellKudaGo", for: indexPath) as! PonaminaluUICollectionViewCell
-//        
-//        
-//        return cellKudaGo
-//    }
-//}
+class NewsCellTableViewControllerCell: UITableViewCell {
+    @IBOutlet weak var picNews: UIImageView!
+    @IBOutlet weak var titleNews: UILabel!
+    @IBOutlet weak var descriptionNews: UILabel!
+}
+
+class HotCellCollectionViewControllerCell: UICollectionViewCell {
+    @IBOutlet weak var topEvent: UIImageView!    
+}

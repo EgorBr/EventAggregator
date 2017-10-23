@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import RealmSwift
 import FirebaseDatabase
 import SWRevealViewController
 
 class FavoriteTableViewController: UITableViewController {
 
+    var favoriteId: [String] = []
     @IBOutlet weak var menuButton: UIBarButtonItem!
 
     override func viewDidLoad() {
@@ -19,14 +21,7 @@ class FavoriteTableViewController: UITableViewController {
         self.navigationItem.title = "Избранное"
         sideMenu()
         customizeNavBar()
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
-
     func sideMenu() {
         if revealViewController() != nil {
             menuButton.target = revealViewController()
@@ -43,6 +38,15 @@ class FavoriteTableViewController: UITableViewController {
         navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
+    func CityName(){
+        let realm = try! Realm()
+        let valueCityName = realm.objects(FavoriteEvent.self)
+        for value in valueCityName {
+            favoriteId.append(value.id)
+            self.tableView.reloadData()
+        }
+        return
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -58,7 +62,7 @@ class FavoriteTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return favoriteId.count
     }
 
     /*

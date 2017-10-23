@@ -7,87 +7,66 @@
 //
 
 import Foundation
+import Alamofire
+import SwiftyJSON
 import FirebaseDatabase
 
-let serialQueue = DispatchQueue(label: "serial_queue")
+let userQueue = DispatchQueue(label: "ru.EventEggragator.userInitiated")
+let backQueue = DispatchQueue(label: "ru.EventEggragator.background", qos: .background)
 let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
+let updateTopGroup = DispatchGroup()
 let semafore = DispatchSemaphore(value: 0)
 let ref = Database.database().reference()
 let refEvent = Database.database().reference().child("Event")
 let refPlace = Database.database().reference().child("Place")
 let refCategory = Database.database().reference().child("Category")
+let refTop = Database.database().reference().child("Top")
 let uds = UserDefaults.standard
 
 let apiKeyPonaminalu: String = "eventapi98471241"
 
 var idArr: [String] = []
-var removeKeyEvent: String = ""
 
 class Utils {
     
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
-
-    func getKeyEvents() {
-        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
-            if let keyValue = snapshot.value as? NSDictionary {
-                var tmpidArr: [String] = []
-                for getKey in keyValue.allKeys {
-                    refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let tmpIdKey = snapshot.value as? NSDictionary {
-                            let subtmpIdKey = tmpIdKey["title"] as? String ?? ""
-                            tmpidArr.append(subtmpIdKey)
-                            idArr = tmpidArr
-                        }
-                    })
-                }
-            }
-        })
-    }
-    
-    func getKeyCity (name: String) {
-        refEvent.observeSingleEvent(of: .value, with: { (snapshot) in
-            if let keyValue = snapshot.value as? NSDictionary {
-                for getKey in keyValue.allKeys {
-                    refEvent.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let tmpName = snapshot.value as? NSDictionary {
-                            if name == tmpName["NAME"] as? String ?? "" {
-                                uds.set(getKey as! String, forKey: "cityKey")
-                                if tmpName["SLUG"] as? String ?? "" != "" {
-                                    uds.set(tmpName["SLUG"] as? String ?? "", forKey: "citySlug")
-                                } else {
-                                    uds.set("", forKey: "citySlug")
-                                }
-                                if tmpName["REGION_ID"] as? String ?? "" != "" {
-                                    uds.set(tmpName["REGION_ID"] as? String ?? "", forKey: "regionId")
-                                } else {
-                                    uds.set("", forKey: "regionId")
-                                }
-                                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
-                                self.getKeyEvents()
-                                
-                            }
-                        }
-                    })
-                }
-            }
-        })
-    }
     
     func removeEvent() {
-        refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child("\(uds.value(forKey: "city") as! String)/Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
-                for getKeyRemove in keyValue.allKeys {
-                    refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKeyRemove as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let startTime = snapshot.value as? NSDictionary {
-                            let tmpStartTime = startTime["start_event"] as? String ?? ""
-                            if Int(NSDate().timeIntervalSince1970) - Decoder().timeConvertToSec(startTime: tmpStartTime) > 10000 {
-                                print("REMOVE \(getKeyRemove as! String)")
-                                refEvent.child(uds.value(forKey: "cityKey") as! String).child("Events").child(getKeyRemove as! String).removeValue()
+                for nameAggr in keyValue.allKeys {
+                    refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)").observeSingleEvent(of: .value, with: { (snapshot) in
+                        if let ev = snapshot.value as? NSDictionary {
+                            for remove in ev.allKeys {
+                                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)").observeSingleEvent(of: .value, with: { (snapshot) in
+                                    if let checkValidate = snapshot.value as? NSDictionary {
+                                        if Int(NSDate().timeIntervalSince1970) - Decoder().timeConvertToSec(startTime: checkValidate["start_event"] as? String ?? "") > 10000 {
+                                            print("REMOVE \(checkValidate["start_event"] as? String ?? "") \(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)")
+                                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)").removeValue()
+                                        }
+                                    }
+                                })
                             }
                         }
                     })
                 }
             }
         })
+    }
+    
+    func loadHotEvent(topId: String, itemNum: Int) {
+        updateTopGroup.enter()
+        Alamofire.request("https://api.cultserv.ru/v4/subevents/get/?session=\(apiKeyPonaminalu)&id=\(topId)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488", method: .get).validate().responseJSON { response in
+            switch response.result {
+            case .success(let value):
+                let json = JSON(value)
+                refTop.child("\(itemNum)/img").setValue("http://media.cultserv.ru/i/300x200/\(json["message"]["image"].stringValue)")
+                refTop.child("\(itemNum)/seo").setValue(json["message"]["event"]["seo"]["alias"].stringValue)
+                refTop.child("\(itemNum)/title").setValue(json["message"]["title"].stringValue)
+            case .failure(let error):
+                print(error)
+            }
+            updateTopGroup.leave()
+        }
     }
 }

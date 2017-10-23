@@ -22,15 +22,16 @@ class SettingsTableViewController: UITableViewController {
     var selectCity: String = ""
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        super.viewDidLoad()
+        self.navigationItem.title = "Настройки"
         sideMenu()
         customizeNavBar()
         
         if selectCity == "" { }
         else if selectCity != uds.value(forKey: "city") as! String {
             uds.set(selectCity, forKey: "city")
-            RootTableViewController().reloadKeyCity()
-//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
+//            LoadViewController().reloadKeyCity()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         }
         
         LableCity.text = uds.value(forKey: "city") as! String
@@ -55,6 +56,9 @@ class SettingsTableViewController: UITableViewController {
     }
     //Разрисовываем navigationBar
     func customizeNavBar() {
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        }
         //Цвет кнопки меню
         navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar

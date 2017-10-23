@@ -17,6 +17,7 @@ class CategoryTableViewControllerCell: UITableViewCell {
 
 class CategoryTableViewController: UITableViewController {
     
+    var categorys: [String:String] = [:]
     var name: [String] = []
     var count: [String] = []
     var slug: [String] = []
@@ -67,7 +68,6 @@ class CategoryTableViewController: UITableViewController {
         } else {
             categoryCell.countLabel.text = self.count[indexPath.row]
         }
-
         return categoryCell
     }
     
@@ -107,14 +107,15 @@ class CategoryTableViewController: UITableViewController {
     }
     */
 
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "setCategory" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let seq = segue.destination as! UINavigationController
+                let categoryVC = seq.topViewController as! EventTableViewController
+                categoryVC.categoryName = slug[indexPath.row]
+                categoryVC.category = name[indexPath.row]
+            }
+        }
     }
-    */
 
 }
