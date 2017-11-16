@@ -26,7 +26,9 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
+        view.backgroundColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 0.65)
+        self.navigationController?.view.addSubview(view)
         UIApplication.shared.keyWindow?.backgroundColor = UIColor.green
         UINavigationBar.appearance().clipsToBounds = true
         
@@ -92,6 +94,7 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
         location.stopUpdatingLocation()
 
     }
+    
 
     /*
     // MARK: - Navigation

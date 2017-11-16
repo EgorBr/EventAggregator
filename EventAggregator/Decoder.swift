@@ -59,7 +59,7 @@ class Decoder {
         
         
     }
-    //переводим из секунд в dd.MM.yyyy HH:mm
+    //переводим из секунд в dd.MM.yyyy HH:mm для кудаго
     func timeConvert(sec: String) -> String {
         if sec != "" {
             let seconds = NSDate(timeIntervalSince1970: Double(sec)!)
@@ -74,7 +74,7 @@ class Decoder {
     // переводим dd.MM.yyyy HH:mm -> СЕК
     func timeConvertToSec(startTime: String) -> Int {
         let datef = DateFormatter()
-        datef.dateFormat = "dd.MM.yyyy HH:mm"
+        datef.dateFormat = "yyy-MM-dd'T'HH:mm:ss"
         let date = datef.date(from: startTime)
         let timestamp = date!.timeIntervalSince1970
         return Int(timestamp)

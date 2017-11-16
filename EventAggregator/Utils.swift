@@ -30,7 +30,7 @@ var idArr: [String] = []
 class Utils {
     
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
-    
+
     func removeEvent() {
         refEvent.child("\(uds.value(forKey: "city") as! String)/Events").observeSingleEvent(of: .value, with: { (snapshot) in
             if let keyValue = snapshot.value as? NSDictionary {
@@ -68,5 +68,13 @@ class Utils {
             }
             updateTopGroup.leave()
         }
+    }
+    
+    func loadImage(url: String) -> NSData {
+        //        backQueue.async {
+        let imgURL: NSURL = NSURL(string: url)!
+        let imgData: NSData = NSData(contentsOf: imgURL as URL)!
+        //        }
+        return imgData
     }
 }

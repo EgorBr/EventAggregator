@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         FirebaseApp.configure()
         
-        UISearchBar.appearance().searchBarStyle = .minimal
+//        UISearchBar.appearance().searchBarStyle = .minimal
 //        UIApplication.shared.isStatusBarHidden = false
 //        UIApplication.shared.statusBarStyle = .lightContent
         UINavigationBar.appearance().barStyle = .blackOpaque

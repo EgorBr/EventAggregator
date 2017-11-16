@@ -33,9 +33,7 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
     var idTopEvent: [String] = []
     var imgTopEvent: [String] = []
     var seoTopEvent: [String] = []
-    var nameTopEvent: [String] = []
-    
-    
+    var nameTopEvent: [String] = []    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,7 +42,7 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
         loadNews()
         showTopEvent()
         self.navigationItem.title = "Лучшее"
-        
+
         // боковое меню
         if revealViewController() != nil {
             menuButton.target = revealViewController()
@@ -58,11 +56,13 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
     
     
     override func viewWillAppear(_ animated: Bool) {
-        var preferredStatusBarStyle: UIStatusBarStyle { return .lightContent }
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
+        view.backgroundColor = UIColor(red: 70/255, green: 59/255, blue: 58/255, alpha: 1)
+        self.navigationController?.view.addSubview(view)
         //Цвет кнопок
-        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        navigationController?.navigationBar.tintColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
-        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
     
@@ -135,6 +135,7 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
                     self.imgCellNews.append(value["images"][0]["image"].stringValue)
                     self.showNews.reloadData()
                 }
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
             case .failure(let error):
                 print(error)
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -146,11 +147,13 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
         refTop.observeSingleEvent(of: .value, with: { (snapshot) in
             if let topItem = snapshot.children.allObjects as? [DataSnapshot] {
                 for item in topItem {
+//                    UIApplication.shared.isNetworkActivityIndicatorVisible = true
                     self.idTopEvent.append(String(describing: item.childSnapshot(forPath: "id").value!))
                     self.seoTopEvent.append(String(describing: item.childSnapshot(forPath: "seo").value!))
                     self.imgTopEvent.append(String(describing: item.childSnapshot(forPath: "img").value!))
                     self.nameTopEvent.append(String(describing: item.childSnapshot(forPath: "title").value!))
                     self.showTop.reloadData()
+//                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
                 
             }

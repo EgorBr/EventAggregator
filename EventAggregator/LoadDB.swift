@@ -24,15 +24,15 @@ class LoadDB {
         
     }
     //загружаем эвенты
-    func Event(name: String) -> Results<CityEvent> {
-        let realm = try! Realm()
-        let details = realm.objects(CityEvent.self).filter("name BEGINSWITH %@", name)
-        return details
-    }
-    
-    func eventDescription(id: String) -> Results<EventTimepad> {
-        let realm = try! Realm()
-        let oneEvent = realm.objects(EventTimepad.self).filter("timepad_id BEGINSWITH %@", id)
-        return oneEvent
-    }
+//    func Event(name: String) -> Results<CityEvent> {
+//        let realm = try! Realm()
+//        let details = realm.objects(CityEvent.self).filter("name BEGINSWITH %@", name)
+//        return details
+//    }
+//    
+//    func eventDescription(id: String) -> Results<EventTimepad> {
+//        let realm = try! Realm()
+//        let oneEvent = realm.objects(EventTimepad.self).filter("timepad_id BEGINSWITH %@", id)
+//        return oneEvent
+//    }
 }

@@ -18,15 +18,8 @@ class LoadViewController: UIViewController {
     let utils: Utils = Utils()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-//        updateTopGroup.wait(timeout: DispatchTime.distantFuture)
-//        var waitResAll = updateTopGroup.wait(timeout: DispatchTime.distantFuture)
-//        print("waitResAll",waitResAll)
-        // проверяем выполняется ли задача сейчас.
-//        var waitResNow =  updateTopGroup.wait(timeout: DispatchTime.now())
-//        print("waitResNow", waitResNow)
-        
-        
+        super.viewDidLoad()        
+
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkAggregator), name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(segue), name: NSNotification.Name(rawValue: "segue"), object: nil)
@@ -52,6 +45,8 @@ class LoadViewController: UIViewController {
         
         // Do any additional setup after loading the view.
         updateTop()
+//        uds.set(0, forKey: "lastLoad")
+//        checkAggregator()
     }
     
     override func didReceiveMemoryWarning() {
@@ -62,7 +57,7 @@ class LoadViewController: UIViewController {
     
     func checkAggregator() {
         //проверяем какие агрегаторы включены и делаем по ним загрузку
-        if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 28800 {
+        if Int(NSDate().timeIntervalSince1970) - (uds.value(forKey: "lastLoad") as! Int) > 10 {
             if uds.bool(forKey: "switchKudaGO") == true {
                 manageKudaGo.loadEventKudaGO()
             }
@@ -96,27 +91,29 @@ class LoadViewController: UIViewController {
     }
     
     func updateTop() {
-        ref.child("Update").observeSingleEvent(of: .value, with: {(snapshot) in
-            if let update = snapshot.children.allObjects as? [DataSnapshot] {
-                for item in update {
-                    if String(describing: item.value!) == "1" {
-                        refTop.observeSingleEvent(of: .value, with: { (snapshot) in
-                            if let topItem = snapshot.children.allObjects as? [DataSnapshot] {
-                                for (index, item) in topItem.enumerated() {
-                                    self.utils.loadHotEvent(topId: String(describing: item.childSnapshot(forPath: "id").value!), itemNum: index + 1)
+        DispatchQueue.main.async { [unowned self] in
+            ref.child("Update").observeSingleEvent(of: .value, with: {(snapshot) in
+                if let update = snapshot.children.allObjects as? [DataSnapshot] {
+                    for item in update {
+                        if String(describing: item.value!) == "true" {
+                            refTop.observeSingleEvent(of: .value, with: { (snapshot) in
+                                if let topItem = snapshot.children.allObjects as? [DataSnapshot] {
+                                    for (index, item) in topItem.enumerated() {
+                                        self.utils.loadHotEvent(topId: String(describing: item.childSnapshot(forPath: "id").value!), itemNum: index + 1)
+                                    }
+                                    updateTopGroup.notify(queue: DispatchQueue.main, execute: {
+                                        ref.child("Update/Top").setValue("false")
+                                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
+                                    })
                                 }
-                                updateTopGroup.notify(queue: DispatchQueue.main, execute: {
-                                    ref.child("Update/Top").setValue("false")
-                                    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
-                                })
-                            }
-                        })
-                    } else {
-                        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
+                            })
+                        } else {
+                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
+                        }
                     }
                 }
-            }
-        })
+            })
+        }
     }
     
     func segue() {

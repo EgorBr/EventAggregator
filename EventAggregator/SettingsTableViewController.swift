@@ -25,7 +25,6 @@ class SettingsTableViewController: UITableViewController {
         super.viewDidLoad()
         self.navigationItem.title = "Настройки"
         sideMenu()
-        customizeNavBar()
         
         if selectCity == "" { }
         else if selectCity != uds.value(forKey: "city") as! String {
@@ -54,15 +53,15 @@ class SettingsTableViewController: UITableViewController {
             tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
-    //Разрисовываем navigationBar
-    func customizeNavBar() {
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
-        }
-        //Цвет кнопки меню
-        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+
+    override func viewWillAppear(_ animated: Bool) {
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
+        view.backgroundColor = UIColor(red: 70/255, green: 59/255, blue: 58/255, alpha: 1)
+        self.navigationController?.view.addSubview(view)
+        //Цвет кнопок
+        navigationController?.navigationBar.tintColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
-        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
 
@@ -70,6 +69,7 @@ class SettingsTableViewController: UITableViewController {
         
         if self.kudaGOSwitch.isOn {
             uds.set(true, forKey: "switchKudaGO")
+            ManageEventKudaGO().loadEventKudaGO()
         } else {
             uds.set(false, forKey: "switchKudaGO")
         }
@@ -86,6 +86,7 @@ class SettingsTableViewController: UITableViewController {
     func showPonaminalu() {
         if ponaminaluSwitch.isOn {
             uds.set(true, forKey: "switchPonaminalu")
+            ManagePonaminaluEvent().loadEventPonaminalu()
         } else {
             uds.set(false, forKey: "switchPonaminalu")
         }

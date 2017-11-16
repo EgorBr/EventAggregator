@@ -10,17 +10,32 @@ import UIKit
 import RealmSwift
 import FirebaseDatabase
 import SWRevealViewController
+import Realm
 
 class FavoriteTableViewController: UITableViewController {
 
+    let realm = try! Realm()
+    
     var favoriteId: [String] = []
+    var favoriteTitle: [String] = []
+    var favoriteDescription: [String] = []
+    var favoriteStart: [String] = []
+    var isFree: [String] = []
+    var favoriteTarget: [String] = []
+    
     @IBOutlet weak var menuButton: UIBarButtonItem!
-
+    @IBOutlet weak var favoriteName: UILabel!
+    @IBOutlet weak var favoriteDesc: UILabel!
+    @IBOutlet weak var favoriteST: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(load), name: NSNotification.Name(rawValue: "loadFavorite"), object: nil)
+        self.tableView.estimatedRowHeight = 15
+        self.tableView.rowHeight = UITableViewAutomaticDimension
         self.navigationItem.title = "Избранное"
         sideMenu()
-        customizeNavBar()
+        load()
     }
     func sideMenu() {
         if revealViewController() != nil {
@@ -30,20 +45,38 @@ class FavoriteTableViewController: UITableViewController {
             tableView.addGestureRecognizer(self.revealViewController().tapGestureRecognizer())
         }
     }
-    //Разрисовываем navigationBar
-    func customizeNavBar() {
-        //Цвет кнопки меню
-        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+   
+    override func viewWillAppear(_ animated: Bool) {
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
+        view.backgroundColor = UIColor(red: 70/255, green: 59/255, blue: 58/255, alpha: 1)
+        self.navigationController?.view.addSubview(view)
+        //Цвет кнопок
+        navigationController?.navigationBar.tintColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
         //Цвет navigationBar
-        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
+        navigationController?.navigationBar.barTintColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
-    func CityName(){
-        let realm = try! Realm()
+    
+    func load(){
+        favoriteId = []
+        favoriteTitle = []
+        favoriteDescription = []
+        favoriteStart = []
+        isFree = []
+        favoriteTarget = []
         let valueCityName = realm.objects(FavoriteEvent.self)
         for value in valueCityName {
-            favoriteId.append(value.id)
-            self.tableView.reloadData()
+            refEvent.child("\(value.region)/Events/\(value.target)/\(value.id)").observeSingleEvent(of: .value, with: { (snapshot) in
+                if let val = snapshot.value as? NSDictionary {
+                    self.favoriteTitle.append(val["short_title"] as? String ?? "")
+                    self.favoriteId.append(val["id"] as? String ?? "")
+                    self.favoriteDescription.append(val["description"] as? String ?? "")
+                    self.favoriteStart.append(val["start_event"] as? String ?? "")
+                    self.isFree.append(val["is_free"] as? String ?? "")
+                    self.favoriteTarget.append(value.target)
+                    self.tableView.reloadData()
+                }
+            })
         }
         return
     }
@@ -64,60 +97,48 @@ class FavoriteTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return favoriteId.count
     }
-
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
+        let favoriteCell = tableView.dequeueReusableCell(withIdentifier: "favoriteCell", for: indexPath)
 
-        // Configure the cell...
+        let labelName: UILabel = favoriteCell.viewWithTag(1) as! UILabel
+        labelName.text = self.favoriteTitle[indexPath.row]
+        
+        let labelDesc: UILabel = favoriteCell.viewWithTag(2) as! UILabel
+        labelDesc.text = self.favoriteDescription[indexPath.row]
+        
+        let labelStart: UILabel = favoriteCell.viewWithTag(3) as! UILabel
+        labelStart.text = self.favoriteStart[indexPath.row]
 
-        return cell
+        return favoriteCell
     }
-    */
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            try! realm.write {
+                realm.delete(realm.objects(FavoriteEvent.self).filter("id=%@",favoriteId[indexPath.row]))
+            }
+            favoriteId.remove(at: indexPath.item)
+//            favoriteTitle.remove(at: indexPath.item)
+//            favoriteId.remove(at: indexPath.item)
+//            favoriteDescription.remove(at: indexPath.item)
+//            favoriteStart.remove(at: indexPath.item)
+//            isFree.remove(at: indexPath.item)
+//            favoriteTarget.remove(at: indexPath.item)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "detailsFavorite" {
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let destinationVC = segue.destination as! DetailsViewController
+                destinationVC.idEvent = favoriteId[indexPath.row]
+                destinationVC.targetName = favoriteTarget[indexPath.row]
+            }
+        }
     }
-    */
+ 
 
 }

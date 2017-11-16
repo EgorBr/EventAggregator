@@ -24,20 +24,13 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         super.viewDidLoad()
         self.navigationItem.title = "Быстрый поиск"
         sideMenu()
-        customizeNavBar()
         //создаем searchController
         searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
 //        searchController.searchBar.placeholder = "Мы найдём для Вас ..."
-        if #available(iOS 11.0, *) {
-            self.navigationItem.searchController = searchController
-            navigationController?.navigationBar.prefersLargeTitles = true
-            navigationItem.hidesSearchBarWhenScrolling = false
-        } else {
-            self.navigationItem.titleView = searchController.searchBar
-            searchController.hidesNavigationBarDuringPresentation = false
-        }
+        tableView.tableHeaderView = searchController.searchBar
+        searchController.hidesNavigationBarDuringPresentation = true
         if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             textfield.textColor = UIColor.black // Цвет текста в searchbar
             if let backgroundview = textfield.subviews.first {
@@ -78,7 +71,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                     for (_, subJSON) in json["message"] {
                         self.result.append(subJSON["title"].stringValue)
                         self.resultId.append(subJSON["subevents"][0]["id"].stringValue)
-                        self.target.append("ponaminalu")
+                        self.target.append("Ponaminalu")
                         self.tableView.reloadData()
                         UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     }
@@ -101,7 +94,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                         for (_, subJSON) in json["results"] {
                             self.result.append(subJSON["title"].stringValue)
                             self.resultId.append(subJSON["id"].stringValue)
-                            self.target.append("kudago")
+                            self.target.append("KudaGO")
                             self.tableView.reloadData()
                             UIApplication.shared.isNetworkActivityIndicatorVisible = false
                         }
@@ -132,10 +125,14 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         }
     }
     
-    //Разрисовываем navigationBar
-    func customizeNavBar() {
-        navigationController?.navigationBar.tintColor = UIColor(colorLiteralRed: 255/255, green: 255/255, blue: 255/255, alpha: 1)
-        navigationController?.navigationBar.barTintColor = UIColor(colorLiteralRed: 42/255, green: 26/255, blue: 25/255, alpha: 1)
+    override func viewWillAppear(_ animated: Bool) {
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
+        view.backgroundColor = UIColor(red: 70/255, green: 59/255, blue: 58/255, alpha: 1)
+        self.navigationController?.view.addSubview(view)
+        //Цвет кнопок
+        navigationController?.navigationBar.tintColor = UIColor(red: 255/255, green: 255/255, blue: 255/255, alpha: 1)
+        //Цвет navigationBar
+        navigationController?.navigationBar.barTintColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
     
@@ -160,7 +157,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                 let destinationVC = segue.destination as! DetailsViewController
                 destinationVC.searchId = resultId[indexPath.row]
                 destinationVC.targetName = target[indexPath.row]
-                dismiss(animated: true, completion: nil)
+                searchController.isActive = false
             }
         }
     }

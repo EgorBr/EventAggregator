@@ -24,7 +24,7 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
         searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
-        self.navigationItem.titleView = searchController.searchBar
+        tableView.tableHeaderView = searchController.searchBar
         searchController.hidesNavigationBarDuringPresentation = false
 
         if let textfield = searchController.searchBar.value(forKey: "searchField") as? UITextField {
@@ -107,14 +107,13 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
                 if searchController.isActive {
                     let destinationVC = segue.destination as! SettingsTableViewController
                     destinationVC.selectCity = filteredCity.sorted(by: < )[indexPath.row]
-                    dismiss(animated: true, completion: nil)
+                    searchController.isActive = false
                 } else {
                     let destinationVC = segue.destination as! SettingsTableViewController
                     destinationVC.selectCity = sortCity[indexPath.row]
-                    dismiss(animated: true, completion: nil)
+                    searchController.isActive = false
                 }
             }
         }
-        dismiss(animated: true, completion: nil)
     }
 }
