@@ -28,13 +28,14 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var stopEvent: UILabel!
     @IBOutlet weak var cost: UILabel!
     
+    //SHARE BUTTON
     @IBAction func shareButton(_ sender: Any) {
         if placeName != "" {
-            let shareEvent = UIActivityViewController(activityItems: ["Взгляни, тебе понравится! 😏 \(String(describing: self.nameDetails.text!)) в \(placeName) \(String(describing: self.startEvent.text!)). https://ponominalu.ru/event/\(seo)?promote=eda0f065aec3fce22d0708362ca67e48"], applicationActivities: nil)
+            let shareEvent = UIActivityViewController(activityItems: ["Взгляни, тебе понравится! 😏 \(String(describing: self.nameDetails.text!)) в \(placeName) \(String(describing: self.startEvent.text!)). \(shotURL!)"], applicationActivities: nil)
             shareEvent.popoverPresentationController?.sourceView = self.view
             self.present(shareEvent, animated: true, completion: nil)
         } else {
-            let shareEvent = UIActivityViewController(activityItems: ["Взгляни, тебе понравится! 😏 \(String(describing: self.nameDetails.text!)). \(String(describing: self.startEvent.text!)). https://ponominalu.ru/event/\(seo)?promote=eda0f065aec3fce22d0708362ca67e48"], applicationActivities: nil)
+            let shareEvent = UIActivityViewController(activityItems: ["Взгляни, тебе понравится! 😏 \(String(describing: self.nameDetails.text!)). \(String(describing: self.startEvent.text!)). \(shotURL!)"], applicationActivities: nil)
             shareEvent.popoverPresentationController?.sourceView = self.view
             self.present(shareEvent, animated: true, completion: nil)
         }
@@ -76,18 +77,23 @@ class DetailsViewController: UIViewController {
 
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
+    let mangeData: ManageData = ManageData()
     
     var idEvent: String = ""
     var searchId: String = ""
     var targetName: String = ""
     
     var eventKey: String = ""
-    var idPlace: String = ""
+    var idPlace: String!
     var seo: String = ""
     var placeName = ""
+    var shotURL: URL!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if targetName == "KudaGo" {
+            buyTicketB.isHidden = true
+        }
         
         let valueCityName = realm.objects(FavoriteEvent.self)
         for value in valueCityName {
@@ -102,11 +108,11 @@ class DetailsViewController: UIViewController {
         fullDescription.sizeToFit()
         nameDetails.sizeToFit()
 //        print(Realm.Configuration.defaultConfiguration.fileURL!)
-        
         // пришли из EventTableViewController и получаем инфу так
         if idEvent != "" {
             loadData()
-        } else if targetName == "KudaGO" && searchId != "" { // если пришли из поиска чтобы посмотреть инфу по мероприятию
+            
+        } else if targetName == "KudaGo" && searchId != "" { // если пришли из поиска чтобы посмотреть инфу по мероприятию
             loadDetailsSearchResultKudaGO()
         } else if targetName == "Ponaminalu" && searchId != "" {
             loadDetailsSearchResultPonaminalu()
@@ -116,7 +122,7 @@ class DetailsViewController: UIViewController {
     
     
     func loadData() { //заполняем вьюху
-        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(idEvent)").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(targetName)/\(idEvent)").observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
                 self.nameDetails.text = val["title"] as? String ?? ""
                 self.fullDescription.text = val["body_text"] as? String ?? ""
@@ -131,10 +137,11 @@ class DetailsViewController: UIViewController {
                     self.stopEvent.text = self.decoder.timeConvert(sec: String((val["stop_event"] as? Int)!))
                 }
                 self.seo = val["seo"] as? String ?? ""
+                self.getShotLink(URL: "")
                 
-                if self.targetName == "KudaGO" {
+                if self.targetName == "KudaGo" {
                     self.idPlace = val["place"] as? String ?? ""
-                    if self.idPlace != "" {
+                    if self.idPlace != nil {
                         refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.value as? NSDictionary == nil {
                                 self.manageKudaGO.loadPlaces(idPlace: self.idPlace)
@@ -166,7 +173,7 @@ class DetailsViewController: UIViewController {
                 }
                 if val["is_free"] as? String ?? "" == "false" {
                     if val["price"] as? String ?? "" == "" {
-                        self.cost.text = "Цена уточняется"
+                        self.cost.text = "Уточните цену в месте проведения."
                     } else {
                         self.cost.text = val["price"] as? String ?? ""
                     }
@@ -178,11 +185,10 @@ class DetailsViewController: UIViewController {
     }
     
     func checkPlace() {
-        var result = ""
         refPlace.observeSingleEvent(of: .value, with: {(snapshot) in
             for id in snapshot.children.allObjects as! [DataSnapshot] {
                 if id.childSnapshot(forPath: "title").value as! String == "бар Strelka" {
-                    result = id.childSnapshot(forPath: "id").value as! String
+                    var result = id.childSnapshot(forPath: "id").value as! String
                 }
             }
         })
@@ -204,6 +210,26 @@ class DetailsViewController: UIViewController {
                     let imgData: NSData = NSData(contentsOf: imgURL as URL)!
                     let image: UIImageView = self.imageEvent
                     image.image = UIImage(data: imgData as Data)
+                    self.place.setTitle(json["message"]["venue"]["title"].stringValue, for: .normal)
+                    ManageData().saveEventToFB(agregator: self.targetName,
+                                               key: json["message"]["event"]["id"].stringValue,
+                                               title: json["message"]["title"].stringValue,
+                                               short_title: json["message"]["title"].stringValue,
+                                               is_free: "false",
+                                               description: json["message"]["description"].stringValue,
+                                               body_text: "",
+                                               start_event: json["message"]["date"].stringValue,
+                                               stop_event: "",
+                                               place: json["message"]["venue"]["title"].stringValue,
+                                               categories: json["message"]["categories"][0]["title"].stringValue,
+                                               min_price: json["message"]["min_price"].stringValue,
+                                               max_price: json["message"]["max_price"].stringValue,
+                                               seo: json["message"]["event"]["seo"]["alias"].stringValue,
+                                               eticket_possible: json["message"]["eticket_possible"].stringValue,
+                                               image: json["message"]["image"].stringValue,
+                                               age_restriction: json["message"]["age"].stringValue)
+                    ManagePonaminaluEvent().descriptionEvent(id: self.searchId, idEvent: json["message"]["event"]["id"].stringValue)
+                    self.getShotLink(URL: "")
                 } else {
                     self.fullDescription.text = "ПОТРАЧЕНО! БОЛЬШЕ НЕТ БИЛЕТОВ"
                 }
@@ -219,6 +245,7 @@ class DetailsViewController: UIViewController {
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
+                self.getShotLink(URL: json["site_url"].stringValue)
                 self.nameDetails.text = json["title"].stringValue
                 self.fullDescription.text = json["body_text"].stringValue
                 self.cost.text = json["price"].stringValue
@@ -256,6 +283,26 @@ class DetailsViewController: UIViewController {
         }
     }
     
+    func getShotLink(URL: String) {
+        var url: String!
+        if targetName == "Ponaminalu" {
+            url = "https://ponominalu.ru/event/\(seo)?promote=eda0f065aec3fce22d0708362ca67e48"
+        } else if targetName == "KudaGo" {
+            url = URL
+        }
+        Alamofire.request("https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyA9cmcL-eNsQSpKwN5xkAvlbb8-B9PIuyo", method: .post, parameters: ["longUrl":url], encoding: JSONEncoding.default).validate().responseJSON { response in
+            
+            switch response.result {
+            case .success(let value) :
+                let json = JSON(value)
+                self.shotURL = json["id"].url!
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
     func showAlertPlace() {
         let alert = UIAlertController(title: nil, message: "Я пока не знаю где находится это место, но я выясняю. Как будет известно, то ты узнаешь об этом первым", preferredStyle: .alert)
         let action = UIAlertAction(title: "Ок", style: .default, handler: nil)
@@ -266,7 +313,7 @@ class DetailsViewController: UIViewController {
     //Идём смотреть инфу по месту проведения
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "place" {
-            if idPlace != "" {
+            if idPlace != nil {
                 let placeVC = segue.destination as! ShowPlaceViewController
                 placeVC.placeId = idPlace
             } else {

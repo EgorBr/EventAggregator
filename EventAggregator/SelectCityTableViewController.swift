@@ -74,8 +74,6 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
         // Dispose of any resources that can be recreated.
     }
 
-    // MARK: - Table view data source
-
     // Количество секций
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -87,7 +85,6 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
         } else {
             return sityList.count
         }
-//
     }
     //Эти строки данными в 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

@@ -11,12 +11,10 @@ import Alamofire
 import SwiftyJSON
 import FirebaseDatabase
 
-class ManagePonaminaluEvent {
+class ManagePonaminaluEvent: Decoder {
     
     let decoder: Decoder = Decoder()
-    let utils: Utils = Utils()
-    
-    
+        
 //    func loadCityPonaminalu() {
 //
 //        Alamofire.request(urlPonaminalu+"v4/regions/list?session=\(apiKeyPonaminalu)", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
@@ -58,31 +56,35 @@ class ManagePonaminaluEvent {
     
     
     func loadEventPonaminalu() {
+        countLoad += 1
         if uds.value(forKey: "regionId") as! String != "" {
             Alamofire.request("https://api.cultserv.ru/v4/events/list?session=\(apiKeyPonaminalu)&region_id=\(uds.value(forKey: "regionId") as! String)&limit=100", method: .get).validate().responseJSON(queue: concurrentQueue) { response in
                 switch response.result {
                 case .success(let value):
                     let json = JSON(value)
-                    for (_, subJSON) in json["message"] {
+                    let aggr = "Ponaminalu"
+                    for (index, subJSON) in json["message"] {
                         if idArr.contains(subJSON["title"].stringValue) == false {
                             let key = subJSON["id"].stringValue
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/id").setValue(subJSON["id"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/title").setValue(subJSON["title"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/short_title").setValue(subJSON["title"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/id").setValue(subJSON["id"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/title").setValue(subJSON["title"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/short_title").setValue(subJSON["title"].stringValue)
                             self.descriptionEvent(id: subJSON["subevents"][0]["id"].stringValue, idEvent: subJSON["id"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/is_free").setValue("false")
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/description").setValue(self.decoder.decodehtmltotxt(htmltxt: subJSON["description"].stringValue) )
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/start_event").setValue(self.decoder.timeConvertToSec(startTime: subJSON["min_date"].stringValue))
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/place").setValue(subJSON["subevents"][0]["venue"]["title"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/categories").setValue(subJSON["categories"][0]["alias"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/price").setValue("от \(subJSON["min_price"].stringValue) до \(subJSON["max_price"].stringValue)")
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/seo").setValue(subJSON["seo"]["alias"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/image").setValue("http://media.cultserv.ru/i/300x200/\(subJSON["subevents"][0]["image"].stringValue)")
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/eticket_possible").setValue(subJSON["eticket_possible"].stringValue)
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(key)/target").setValue("Ponaminalu")
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/is_free").setValue("false")
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/description").setValue(self.decoder.decodehtmltotxt(htmltxt: subJSON["description"].stringValue) )
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/start_event").setValue(self.decoder.timeConvertToSec(startTime: subJSON["min_date"].stringValue))
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/place").setValue(subJSON["subevents"][0]["venue"]["title"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/categories").setValue(subJSON["categories"][0]["alias"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/price").setValue("от \(subJSON["min_price"].stringValue) до \(subJSON["max_price"].stringValue)")
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/seo").setValue(subJSON["seo"]["alias"].stringValue)
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/target").setValue("Ponaminalu")
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/image").setValue("http://media.cultserv.ru/i/300x200/\(subJSON["subevents"][0]["image"].stringValue)")
+                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggr)/\(key)/eticket_possible").setValue(subJSON["eticket_possible"].stringValue)
+                        }
+                        if Int(index)! + 1 == json["message"].count {
+                            persentLoad += statusLoad
                         }
                     }
-                    
                 case .failure(let error):
                     print(error)
                 }
@@ -95,7 +97,7 @@ class ManagePonaminaluEvent {
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
-                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(idEvent)/body_text").setValue(self.decoder.decodehtmltotxt(htmltxt: json["message"].stringValue))
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/Ponaminalu/\(idEvent)/body_text").setValue(self.decoder.decodehtmltotxt(htmltxt: json["message"].stringValue))
             case .failure(let error):
                 print(error)
             }

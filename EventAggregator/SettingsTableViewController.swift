@@ -23,9 +23,8 @@ class SettingsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = "Настройки"
         sideMenu()
-        
+        self.navigationItem.title = "Настройки"
         if selectCity == "" { }
         else if selectCity != uds.value(forKey: "city") as! String {
             uds.set(selectCity, forKey: "city")
@@ -42,7 +41,13 @@ class SettingsTableViewController: UITableViewController {
         kudaGOSwitch.isOn = uds.bool(forKey: "switchKudaGO")
         timePadSwitch.isOn = uds.bool(forKey: "switchTimaPad")
         ponaminaluSwitch.isOn = uds.bool(forKey: "switchPonaminalu")
-
+        
+        if uds.value(forKey: "citySlug") as! String == "" {
+            kudaGOSwitch.isEnabled = false
+        }
+        if uds.value(forKey: "regionId") as! String == "" {
+            ponaminaluSwitch.isEnabled = false
+        }
     }
     
     func sideMenu() {
@@ -67,9 +72,8 @@ class SettingsTableViewController: UITableViewController {
 
     func showKudaGo() {
         
-        if self.kudaGOSwitch.isOn {
+        if kudaGOSwitch.isOn {
             uds.set(true, forKey: "switchKudaGO")
-            ManageEventKudaGO().loadEventKudaGO()
         } else {
             uds.set(false, forKey: "switchKudaGO")
         }
@@ -86,7 +90,6 @@ class SettingsTableViewController: UITableViewController {
     func showPonaminalu() {
         if ponaminaluSwitch.isOn {
             uds.set(true, forKey: "switchPonaminalu")
-            ManagePonaminaluEvent().loadEventPonaminalu()
         } else {
             uds.set(false, forKey: "switchPonaminalu")
         }

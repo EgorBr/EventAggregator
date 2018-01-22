@@ -13,44 +13,34 @@ import RealmSwift
 import Firebase
 import SWRevealViewController
 
-
 class EventTableViewController: UITableViewController {
 
-    var start: [Int] = [0]
-    var aggrs: [String] = []
-
-    let decoder: Decoder = Decoder()
-    
-    var indexOfPageRequest = 1
-    
     @IBOutlet weak var menuButton: UIBarButtonItem!
     @IBOutlet weak var categoriesButton: UIBarButtonItem!
     @IBOutlet weak var filterButton: UIBarButtonItem!
     
     var city: String = uds.value(forKey: "city") as! String
+    var source = [Variables]()
+    var currentScore:Int!
+    var currentKey:String!
     
-    var categoryName: String = ""
-
-    var nameEvent: [String] = []
-    var eventDescription: [String] = []
-    var startEventTime: [String] = []
-    var id: [String] = []
-    var isFree: [String] = []
-    var target: [String] = []
-    var image: [NSData] = []
+    var aggrs: [String] = []
+    var category: String!
+    var categoryName: String!
     
-    var category: String = ""
-    
-    var refresher: UIRefreshControl!
-    
-    let loadDB: LoadDB = LoadDB()
-    let manageTimepad: ManageEventTimepad = ManageEventTimepad()
-    let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
-    let managePonaminalu: ManagePonaminaluEvent = ManagePonaminaluEvent()
-    let utils:Utils = Utils()
+    private var refresher: UIRefreshControl!
+    let utils: Utils = Utils()
+    let decoder: Decoder = Decoder()
+    let spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // обновление списка мерприятий свайпом вниз
+        refresher = UIRefreshControl()
+        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refresher.addTarget(self, action: #selector(EventTableViewController.refreshLoad), for: .valueChanged)
+        tableView.addSubview(refresher)
+        
         if uds.bool(forKey: "switchPonaminalu") == true {
             aggrs.append("Ponaminalu")
         }
@@ -65,19 +55,16 @@ class EventTableViewController: UITableViewController {
         self.tableView.rowHeight = UITableViewAutomaticDimension
         sideMenu()
         
-        if category == "" {
+        if category == nil {
             self.navigationItem.title = uds.value(forKey: "city") as! String
         } else {
             self.navigationItem.title = "\(uds.value(forKey: "city") as! String). \(category)"
         }
 
-        loadData()
-        // обновление списка мерприятий свайпом вниз
-        refresher = UIRefreshControl()
-        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
-        refresher.addTarget(self, action: #selector(loadData), for: UIControlEvents.valueChanged)
-        tableView.addSubview(refresher)
+        loadListEvent()
+
     }
+
     
     // выводим краткую инфу по мероприятиям в зависимости отквключенных агрегаторов
     
@@ -103,61 +90,68 @@ class EventTableViewController: UITableViewController {
         navigationController?.navigationBar.barTintColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
     }
-
-    func loadData() {
-        for name in aggrs {
-            print(name)
-            refEvent.child("\(uds.value(forKey: "city") as! String)/Events").queryOrdered(byChild: "start_event").queryStarting(atValue: start.last! + 1).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-                self.start = []
-                for val in snapshot.children.allObjects as! [DataSnapshot] {
-                    print(val.childSnapshot(forPath: "target").value! as! String)
-                    if val.childSnapshot(forPath: "target").value! as! String == name {
-                        self.nameEvent.append(val.childSnapshot(forPath: "short_title").value! as! String)
-                        self.id.append(val.childSnapshot(forPath: "id").value! as! String)
-                        self.eventDescription.append(val.childSnapshot(forPath: "description").value! as! String)
-                        self.startEventTime.append(self.decoder.timeConvert(sec: String(val.childSnapshot(forPath: "start_event").value! as! Int)))
-                        self.isFree.append(val.childSnapshot(forPath: "is_free").value! as! String)
-                        self.image.append( NSData(contentsOf: NSURL(string: val.childSnapshot(forPath: "image").value! as! String)! as URL)!)
-                        self.target.append(val.childSnapshot(forPath: "target").value! as! String)
-                        self.start.append(Int(val.childSnapshot(forPath: "id").value! as! String)!)
+    
+    func refreshLoad() {
+        source = []
+        self.tableView.reloadData()
+        for aggregator in aggrs {
+            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                if snapshot.childrenCount > 0 {
+                    let first = snapshot.children.allObjects.last as! DataSnapshot
+                    for s in snapshot.children.allObjects as! [DataSnapshot]{
+                        let item = s.value as! Dictionary<String,AnyObject?>
+                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                        self.source.append(variables)
                     }
+                    self.currentKey = first.key
+                    self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
+                    self.refresher.endRefreshing()
+                    self.tableView.reloadData()
+                    
                 }
-                self.tableView.reloadData()
             })
         }
-        
-        
-//        if uds.bool(forKey: "switchKudaGO") == true {
-//            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/KudaGO").queryOrdered(byChild: "start_event").queryStarting(atValue: Int(startAtK.last!)! + 1).queryLimited(toFirst: 50).observeSingleEvent(of: .value, with: { (snapshot) in
-//                self.startAtK = []
-//                for val in snapshot.children.allObjects as! [DataSnapshot] {
-//                    self.nameEvent.append(val.childSnapshot(forPath: "short_title").value! as! String)
-//                    self.id.append(val.childSnapshot(forPath: "id").value! as! String)
-//                    self.eventDescription.append(val.childSnapshot(forPath: "description").value! as! String)
-//                    self.startEventTime.append(val.childSnapshot(forPath: "start_event").value! as! String)
-//                    self.isFree.append(val.childSnapshot(forPath: "is_free").value! as! String)
-//                    self.image.append( NSData(contentsOf: NSURL(string: val.childSnapshot(forPath: "image").value! as! String)! as URL)!)
-//                    self.target.append("KudaGO")
-//                    self.startAtK.append(val.childSnapshot(forPath: "id").value! as! String)
-//                }
-//                self.tableView.reloadData()
-//            })
-//        }
-//        if uds.bool(forKey: "switchTimaPad") == true {
-//            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/TimePad").queryOrdered(byChild: "id").queryStarting(atValue: Int(startAtT.last!)! + 1).queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot) in
-//                for val in snapshot.children.allObjects as! [DataSnapshot] {
-//                    self.nameEvent.append(val.childSnapshot(forPath: "short_title").value! as! String)
-//                    self.id.append(val.childSnapshot(forPath: "id").value! as! String)
-//                    self.eventDescription.append(val.childSnapshot(forPath: "description").value! as! String)
-//                    self.startEventTime.append(val.childSnapshot(forPath: "start_event").value! as! String)
-//                    self.isFree.append(val.childSnapshot(forPath: "is_free").value! as! String)
-//                    self.image.append( NSData(contentsOf: NSURL(string: val.childSnapshot(forPath: "image").value! as! String)! as URL)!)
-//                    self.target.append("TimePad")
-//                    self.startAtT.append(val.childSnapshot(forPath: "id").value! as! String)
-//                }
-//            })
-//        }
-        
+    }
+
+    func loadListEvent() {
+        for aggregator in aggrs {
+            if currentKey == nil {
+                utils.showActivityIndicator(uiView: self.view)
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                    if snapshot.childrenCount > 0 {
+                        let first = snapshot.children.allObjects.last as! DataSnapshot
+                        for s in snapshot.children.allObjects as! [DataSnapshot]{
+                            let item = s.value as! Dictionary<String,AnyObject?>
+                            let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                            self.source.append(variables)
+                        }
+                        self.currentKey = first.key
+                        self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
+                        self.tableView.reloadData()
+                        self.utils.hideActivityIndicator(uiView: self.view)
+                    }
+                })
+            } else {
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryStarting(atValue: self.currentScore).queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                    if snapshot.childrenCount > 0 {
+                        let first = snapshot.children.allObjects.last as! DataSnapshot
+                        for s in snapshot.children.allObjects as! [DataSnapshot]{
+                            if s.key != self.currentKey {
+                                let item = s.value as! Dictionary<String,AnyObject?>
+                                let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                self.source.append(variables)
+//                                self.source.insert(variables, at: self.source.count)
+                            }
+                        }
+                        self.currentKey = first.key
+                        self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
+                        self.tableView.reloadData()
+                    }
+                    self.spinner.stopAnimating()
+                    self.tableView.tableFooterView = nil
+                })
+            }
+        }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -167,41 +161,37 @@ class EventTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return id.count
+        return source.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let eventCell = tableView.dequeueReusableCell(withIdentifier: "eventCell", for: indexPath) as! EventCellTableViewControllerCell
-        
-        eventCell.headline.text = nameEvent[indexPath.row]
-        eventCell.descLable.text = eventDescription[indexPath.row]
-        eventCell.timeAtStart.text = startEventTime[indexPath.row]
-        eventCell.imageEvent.image = UIImage(data: image[indexPath.row] as Data)
-        if isFree[indexPath.row] == "true" {
-            eventCell.cost.text = "Бесплатное"
-        } else {
-            eventCell.cost.text = "Платное"
-        }
-        
+        eventCell.headline.text = source[indexPath.row]._nameEvent
+        eventCell.descLable.text = source[indexPath.row]._eventDescription
+        eventCell.timeAtStart.text = source[indexPath.row]._startEventTime
+        eventCell.imageEvent.image = UIImage(data: source[indexPath.row]._image as Data)
+        eventCell.cost.text = source[indexPath.row]._isFree
         return eventCell
     }
     
-    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let lastItem = id.count - 1
-        print("indexPath.row = \(indexPath.row),lastItem = \(lastItem)")
-        if indexPath.row == lastItem {
-//            limit += 10
-//            loadData()
+    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let currentOffset = scrollView.contentOffset.y
+        let maxOffset = scrollView.contentSize.height - scrollView.frame.height
+        if maxOffset - currentOffset <= 44 && self.source.count != 0 {
+            spinner.startAnimating()
+            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width * 2, height: CGFloat(44))
+            tableView.tableFooterView = spinner
+            tableView.tableFooterView?.isHidden = false
+            self.loadListEvent()
         }
     }
-    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detailsEvent" {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let destinationVC = segue.destination as! DetailsViewController
-                destinationVC.idEvent = id[indexPath.row]
-                destinationVC.targetName = target[indexPath.row]
+                destinationVC.idEvent = self.source[indexPath.row]._id
+                destinationVC.targetName = self.source[indexPath.row]._target
             }
         }
     }
@@ -213,5 +203,4 @@ class EventCellTableViewControllerCell: UITableViewCell {
     @IBOutlet weak var descLable: UILabel!
     @IBOutlet weak var timeAtStart: UILabel!
     @IBOutlet weak var cost: UILabel!
-    
 }

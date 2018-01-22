@@ -94,7 +94,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
                         for (_, subJSON) in json["results"] {
                             self.result.append(subJSON["title"].stringValue)
                             self.resultId.append(subJSON["id"].stringValue)
-                            self.target.append("KudaGO")
+                            self.target.append("KudaGo")
                             self.tableView.reloadData()
                             UIApplication.shared.isNetworkActivityIndicatorVisible = false
                         }

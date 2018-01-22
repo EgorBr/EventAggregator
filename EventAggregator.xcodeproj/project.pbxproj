@@ -13,6 +13,7 @@
 		F43996111F9568D50025EADE /* NewsDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43996101F9568D50025EADE /* NewsDetailsViewController.swift */; };
 		F43BBD141F89656E00419B85 /* EventMapLocationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43BBD131F89656E00419B85 /* EventMapLocationViewController.swift */; };
 		F45524031F1E891600AE1318 /* LoadDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45524021F1E891600AE1318 /* LoadDB.swift */; };
+		F466FA9D200D3365002C41D8 /* Variables.swift in Sources */ = {isa = PBXBuildFile; fileRef = F466FA9C200D3365002C41D8 /* Variables.swift */; };
 		F473AE121F86E3A7008A4B63 /* CategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F473AE111F86E3A7008A4B63 /* CategoryTableViewController.swift */; };
 		F476CBC91F1D38F7007349F5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F476CBC81F1D38F7007349F5 /* AppDelegate.swift */; };
 		F476CBCE1F1D38F7007349F5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F476CBCC1F1D38F7007349F5 /* Main.storyboard */; };
@@ -31,6 +32,7 @@
 		F4CA76531F4E271A0091083E /* SearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4CA76521F4E271A0091083E /* SearchTableViewController.swift */; };
 		F4D43FC11F8916A2000FE8FC /* MapPin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D43FC01F8916A2000FE8FC /* MapPin.swift */; };
 		F4D6B8EF1F22A60100A06996 /* Decoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4D6B8EE1F22A60100A06996 /* Decoder.swift */; };
+		F4DBDACB200E7C7700CC7706 /* ManageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4DBDACA200E7C7700CC7706 /* ManageData.swift */; };
 		F4E4D5A61FABB5AF003B944A /* SetFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E4D5A51FABB5AF003B944A /* SetFilterViewController.swift */; };
 		F4E5B0D91F82DD0100945FEE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4E5B0D81F82DD0100945FEE /* MapKit.framework */; };
 		F4EDDCA91F4F60C900444AD3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */; };
@@ -48,6 +50,7 @@
 		F43996101F9568D50025EADE /* NewsDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsDetailsViewController.swift; sourceTree = "<group>"; };
 		F43BBD131F89656E00419B85 /* EventMapLocationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMapLocationViewController.swift; sourceTree = "<group>"; };
 		F45524021F1E891600AE1318 /* LoadDB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoadDB.swift; sourceTree = "<group>"; };
+		F466FA9C200D3365002C41D8 /* Variables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variables.swift; sourceTree = "<group>"; };
 		F473AE111F86E3A7008A4B63 /* CategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryTableViewController.swift; sourceTree = "<group>"; };
 		F476CBC51F1D38F7007349F5 /* EventAggregator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EventAggregator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F476CBC81F1D38F7007349F5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -68,6 +71,7 @@
 		F4CA76521F4E271A0091083E /* SearchTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableViewController.swift; sourceTree = "<group>"; };
 		F4D43FC01F8916A2000FE8FC /* MapPin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapPin.swift; sourceTree = "<group>"; };
 		F4D6B8EE1F22A60100A06996 /* Decoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Decoder.swift; sourceTree = "<group>"; };
+		F4DBDACA200E7C7700CC7706 /* ManageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageData.swift; sourceTree = "<group>"; };
 		F4E4D5A51FABB5AF003B944A /* SetFilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetFilterViewController.swift; sourceTree = "<group>"; };
 		F4E5B0D81F82DD0100945FEE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		F4EDDCA81F4F60C900444AD3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -130,6 +134,7 @@
 			children = (
 				F476CBC81F1D38F7007349F5 /* AppDelegate.swift */,
 				F495CF661F51E56F00E0B6B0 /* Utils.swift */,
+				F466FA9C200D3365002C41D8 /* Variables.swift */,
 				F47D02681F51BA9B00C3220B /* Controllers */,
 				F47D02671F51BA8900C3220B /* MangeData */,
 				F4CA76541F4E34930091083E /* DB */,
@@ -152,6 +157,7 @@
 				F4D6B8EE1F22A60100A06996 /* Decoder.swift */,
 				F45524021F1E891600AE1318 /* LoadDB.swift */,
 				F4D43FC01F8916A2000FE8FC /* MapPin.swift */,
+				F4DBDACA200E7C7700CC7706 /* ManageData.swift */,
 			);
 			name = MangeData;
 			sourceTree = "<group>";
@@ -346,6 +352,7 @@
 				F4BC4FF61F8D50AA0007414D /* BuyWebViewController.swift in Sources */,
 				F4EDDCAB1F4F63AA00444AD3 /* RootTableViewController.swift in Sources */,
 				F488C19D1F27D6D600FC76A4 /* DetailsViewController.swift in Sources */,
+				F4DBDACB200E7C7700CC7706 /* ManageData.swift in Sources */,
 				F4CA76531F4E271A0091083E /* SearchTableViewController.swift in Sources */,
 				F4E4D5A61FABB5AF003B944A /* SetFilterViewController.swift in Sources */,
 				F4EEB87C1F97F85500998B6B /* ScaleStoryboardSegue.swift in Sources */,
@@ -357,6 +364,7 @@
 				F47D026A1F51BC6400C3220B /* SettingsTableViewController.swift in Sources */,
 				F473AE121F86E3A7008A4B63 /* CategoryTableViewController.swift in Sources */,
 				F4133B5A1F7AC3B6000CC446 /* ShowPlaceViewController.swift in Sources */,
+				F466FA9D200D3365002C41D8 /* Variables.swift in Sources */,
 				F43996111F9568D50025EADE /* NewsDetailsViewController.swift in Sources */,
 				F476CBE31F1D3A70007349F5 /* ManageEventTimepad.swift in Sources */,
 				F47D026C1F51BC9700C3220B /* SelectCityTableViewController.swift in Sources */,
@@ -508,6 +516,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -524,6 +533,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = ru.Bryzgalov.EventAggregator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

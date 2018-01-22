@@ -10,6 +10,7 @@ import Foundation
 import WebKit
 
 class Decoder {
+
     //выбрасываем HTML текст
     func decodehtmltotxt(htmltxt: String) -> String {
         let encodedString = htmltxt
@@ -76,8 +77,13 @@ class Decoder {
         let datef = DateFormatter()
         datef.dateFormat = "yyy-MM-dd'T'HH:mm:ss"
         let date = datef.date(from: startTime)
-        let timestamp = date!.timeIntervalSince1970
-        return Int(timestamp)
+        if date == nil {
+            return 0
+        } else {
+            let timestamp = date!.timeIntervalSince1970
+            return Int(timestamp)
+        }
+        
     }
     
 }

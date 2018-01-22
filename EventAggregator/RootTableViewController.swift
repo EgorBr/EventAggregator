@@ -25,21 +25,16 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
     let managePonaminalu: ManagePonaminaluEvent = ManagePonaminaluEvent()
     let utils: Utils = Utils()
     
-    var idCellNews: [String] = []
-    var titleCellNews: [String] = []
-    var descriptionCellNews: [String] = []
-    var imgCellNews: [String] = []
-    
     var idTopEvent: [String] = []
     var imgTopEvent: [String] = []
-    var seoTopEvent: [String] = []
-    var nameTopEvent: [String] = []    
+    var eventID: [String] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.showNews.estimatedRowHeight = 15
         self.showNews.rowHeight = UITableViewAutomaticDimension
-        loadNews()
+
         showTopEvent()
         self.navigationItem.title = "Лучшее"
 
@@ -52,8 +47,6 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
         }
         
     }
-        
-    
     
     override func viewWillAppear(_ animated: Bool) {
         let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
@@ -73,7 +66,6 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let hotCell = collectionView.dequeueReusableCell(withReuseIdentifier: "hotCell", for: indexPath) as! HotCellCollectionViewControllerCell
-//        hotCell.hotName.text = nameTopEvent[indexPath.row]
         backQueue.async {
             let imgURL: NSURL = NSURL(string: self.imgTopEvent[indexPath.row])!
             let imgData: NSData = NSData(contentsOf: imgURL as URL)!
@@ -81,9 +73,39 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
             DispatchQueue.main.async {
                 image.image = UIImage(data: imgData as Data)
             }
+            
         }
         return hotCell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let top: DetailsViewController = self.storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
+        top.targetName = "Ponaminalu"
+        top.idEvent = eventID[indexPath.row]
+        self.navigationController?.pushViewController(top, animated: true)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        var rowIndex = indexPath.row
+        let numberOfRecords = self.imgTopEvent.count - 1
+        print(rowIndex, numberOfRecords)
+        if rowIndex < numberOfRecords {
+            rowIndex = rowIndex + 1
+        } else {
+            rowIndex = 0
+        }
+        
+        Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(RootViewController.startTimer(timer:)), userInfo: rowIndex, repeats: true)
+        
+    }
+    
+    func startTimer(timer: Timer) {
+        UIView.animate(withDuration: 1.0, delay: 0, options: .curveEaseOut, animations: {
+            self.showTop.scrollToItem(at: IndexPath(row: timer.userInfo! as! Int, section: 0), at: .centeredHorizontally, animated: false)
+            }, completion: nil)
+    }
+    
     /*-------------------------*COLLECTION VIEW*-------------------------*/
                         //-//-//-//-//-//-//-//-//-//-//
     /*----------------------------*TABLE VIEW*---------------------------*/
@@ -93,19 +115,12 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let newsCell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as! NewsCellTableViewControllerCell
-        newsCell.titleNews.text = self.titleCellNews[indexPath.row]
-        newsCell.descriptionNews.text = self.descriptionCellNews[indexPath.row]
-        backQueue.async {
-            let imgURL: NSURL = NSURL(string: self.imgCellNews[indexPath.row])!
-            let imgData: NSData = NSData(contentsOf: imgURL as URL)!
-            let image: UIImageView = newsCell.picNews
-            DispatchQueue.main.async {
-                image.image = UIImage(data: imgData as Data)
-            }
-        }
+        newsCell.titleNews.text = titleCellNews[indexPath.row]
+        newsCell.descriptionNews.text = descriptionCellNews[indexPath.row]
+        newsCell.picNews.image = UIImage(data: imgCellNews[indexPath.row] as Data)
+        
         return newsCell
     }
-    /*----------------------------*TABLE VIEW*---------------------------*/
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "newsDetails" {
@@ -114,46 +129,19 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
                 destinationVC.idNews = idCellNews[indexPath.row]
             }
         }
-//        if segue.identifier == "topDetails" {
-//            if let indexPath = showTop.indexPathsForSelectedItems {
-//                let destinationVC = segue.destination as! DetailsViewController
-//                destinationVC.searchId = idTopEvent[indexPath.i]
-//            }
-//        }
     }
     
-    func loadNews() {
-        UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        Alamofire.request("https://kudago.com/public-api/v1.2/news/?fields=id,title,description,images&order_by=-publication_date&text_format=text&location=\(uds.value(forKey: "citySlug") as! String)", method: .get).validate().responseJSON { response in
-            switch response.result {
-            case .success(let value):
-                let json = JSON(value)
-                for (_, value) in json["results"] {
-                    self.idCellNews.append(value["id"].stringValue)
-                    self.titleCellNews.append(value["title"].stringValue)
-                    self.descriptionCellNews.append(value["description"].stringValue)
-                    self.imgCellNews.append(value["images"][0]["image"].stringValue)
-                    self.showNews.reloadData()
-                }
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            case .failure(let error):
-                print(error)
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            }
-        }
-    }
+    /*----------------------------*TABLE VIEW*---------------------------*/
+    
     
     func showTopEvent() {
         refTop.observeSingleEvent(of: .value, with: { (snapshot) in
             if let topItem = snapshot.children.allObjects as? [DataSnapshot] {
                 for item in topItem {
-//                    UIApplication.shared.isNetworkActivityIndicatorVisible = true
                     self.idTopEvent.append(String(describing: item.childSnapshot(forPath: "id").value!))
-                    self.seoTopEvent.append(String(describing: item.childSnapshot(forPath: "seo").value!))
+                    self.eventID.append(String(describing: item.childSnapshot(forPath: "eventID").value!))
                     self.imgTopEvent.append(String(describing: item.childSnapshot(forPath: "img").value!))
-                    self.nameTopEvent.append(String(describing: item.childSnapshot(forPath: "title").value!))
                     self.showTop.reloadData()
-//                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
                 
             }
