@@ -42,8 +42,13 @@ struct Variables {
             }
         }
         if let image = dict["image"] as? String {
-            let tmpImg = NSData(contentsOf: NSURL(string: image)! as URL)!
-            self._image = tmpImg
+            if image == "" {
+//                self._image = NSData(contentsOf: #imageLiteral(resourceName: "no_photo"))
+            } else {
+                let tmpImg = Utils().loadImage(url: image)
+//                    NSData(contentsOf: NSURL(string: image)! as URL)!
+                self._image = tmpImg
+            }
         }
         if let target = dict["target"] as? String {
             self._target = target

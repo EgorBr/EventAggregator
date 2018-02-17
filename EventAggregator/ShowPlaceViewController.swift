@@ -18,11 +18,18 @@ class ShowPlaceViewController: UIViewController {
     @IBOutlet weak var cityPlaceLabel: UILabel!
     @IBOutlet weak var addressPlaceLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
+    @IBOutlet weak var underground: UILabel!
     
-    var placeId: String = ""    
+    var placeId: String = ""
+    var aggregator: String!
+    
+    var lat: String!
+    var lon: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("placeId", placeId)
+        print("aggregator", aggregator)
         UIApplication.shared.isNetworkActivityIndicatorVisible = true //Запускает индикатор загрузки
         //заполняем инфой о месте проведения
         refPlace.child(self.placeId).observeSingleEvent(of: .value, with: { (snapshot) in
@@ -57,21 +64,24 @@ class ShowPlaceViewController: UIViewController {
         refPlace.child("\(self.placeId)/coords").observeSingleEvent(of: .value, with: { (snaphot) in
             if let coords = snaphot.value as? NSDictionary {
                 //Создаём точку на карте и задаём радиус отображения
-                let location = CLLocation(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                if self.placeId.characters.last! == "P" {
+                    self.underground.isHidden = true
+                    self.lat = (coords["lat"] as? String ?? "").components(separatedBy: ",")[0].components(separatedBy: " ")[0]
+                    self.lon = (coords["lat"] as? String ?? "").components(separatedBy: ",")[1].components(separatedBy: " ")[1]
+                } else {
+                    self.lat = coords["lat"] as? String ?? ""
+                    self.lon = coords["lon"] as? String ?? ""
+                }
+                let location = CLLocation(latitude: Double(self.lat)!, longitude: Double(self.lon)!)
                 let radius: CLLocationDistance = 500
                 let point = MKCoordinateRegionMakeWithDistance(location.coordinate, radius, radius )
                 self.mapView.setRegion(point, animated: true)
                 //ставим булавку в указанном месте
-                let pin = CLLocationCoordinate2D(latitude: Double(coords["lat"] as? String ?? "")!, longitude: Double(coords["lon"] as? String ?? "")!)
+                let pin = CLLocationCoordinate2D(latitude: Double(self.lat)!, longitude: Double(self.lon)!)
                 let setPin = MapPin(title: "", subtitle: "", coordinate: pin)
                 self.mapView.addAnnotation(setPin)
             }
         })
         
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 }

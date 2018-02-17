@@ -12,6 +12,7 @@ import SwiftyJSON
 import RealmSwift
 import FirebaseDatabase
 import SwiftMessages
+import EventKit
 
 class DetailsViewController: UIViewController {
     
@@ -27,6 +28,7 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var startEvent: UILabel!
     @IBOutlet weak var stopEvent: UILabel!
     @IBOutlet weak var cost: UILabel!
+    @IBOutlet weak var favoriteOutletButton: UIButton!
     
     //SHARE BUTTON
     @IBAction func shareButton(_ sender: Any) {
@@ -42,9 +44,9 @@ class DetailsViewController: UIViewController {
         
     }
     
-    @IBOutlet weak var favoriteOutletButton: UIButton!
     //кнопка для добавления в избранное
     @IBAction func favoriteAction(_ sender: AnyObject) {
+//        self.getShotLink(URL: "")
         let favorite = FavoriteEvent()
         favorite.id = idEvent
         favorite.region = uds.value(forKey: "city") as! String
@@ -73,8 +75,30 @@ class DetailsViewController: UIViewController {
             SwiftMessages.show(config: config, view: view)
         }
     }
-    //
 
+    @IBAction func addToCalendar(_ sender: Any) {
+        let eventStore: EKEventStore = EKEventStore()
+        
+        eventStore.requestAccess(to: .event, completion: {(granted, error) in
+            if (granted) && (error == nil) {
+                let event: EKEvent = EKEvent(eventStore: eventStore)
+                event.title = self.eventName
+                event.startDate = Date(timeIntervalSince1970: self.starEvent)
+                event.endDate = Date(timeIntervalSince1970: (self.starEvent + 7200))
+                event.location = self.eventNotes
+//                event.alarms = EKAlarm(
+                event.calendar = eventStore.defaultCalendarForNewEvents
+                do {
+                    try eventStore.save(event, span: .thisEvent)
+                } catch let error as NSError {
+                    print("ERROR: ", error )
+                }
+                self.showAlert(message: "Событие добавлено в календарь")
+            }
+        })
+    }
+    
+    
     let loadDB: LoadDB = LoadDB()
     let manageKudaGO: ManageEventKudaGO = ManageEventKudaGO()
     let mangeData: ManageData = ManageData()
@@ -89,9 +113,13 @@ class DetailsViewController: UIViewController {
     var placeName = ""
     var shotURL: URL!
     
+    var eventName: String!
+    var starEvent: Double!
+    var eventNotes: String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        if targetName == "KudaGo" {
+        if targetName == "KudaGo" || targetName == "TimePad" {
             buyTicketB.isHidden = true
         }
         
@@ -104,14 +132,12 @@ class DetailsViewController: UIViewController {
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         NotificationCenter.default.addObserver(self, selector: #selector(loadData), name: NSNotification.Name(rawValue: "loadData"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(showAlertPlace), name: NSNotification.Name(rawValue: "unknowplace"), object: nil)
         fullDescription.sizeToFit()
         nameDetails.sizeToFit()
 //        print(Realm.Configuration.defaultConfiguration.fileURL!)
         // пришли из EventTableViewController и получаем инфу так
         if idEvent != "" {
             loadData()
-            
         } else if targetName == "KudaGo" && searchId != "" { // если пришли из поиска чтобы посмотреть инфу по мероприятию
             loadDetailsSearchResultKudaGO()
         } else if targetName == "Ponaminalu" && searchId != "" {
@@ -122,10 +148,12 @@ class DetailsViewController: UIViewController {
     
     
     func loadData() { //заполняем вьюху
-        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(targetName)/\(idEvent)").observeSingleEvent(of: .value, with: { (snapshot) in
+        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(idEvent)").observeSingleEvent(of: .value, with: { (snapshot) in
             if let val = snapshot.value as? NSDictionary {
                 self.nameDetails.text = val["title"] as? String ?? ""
+                self.eventName = val["title"] as? String ?? ""
                 self.fullDescription.text = val["body_text"] as? String ?? ""
+                /*---------------------------------------*/
                 if val["image"] as? String ?? "" != "" {
                     let imgURL: NSURL = NSURL(string: val["image"] as? String ?? "")!
                     let imgData: NSData = NSData(contentsOf: imgURL as URL)!
@@ -133,46 +161,70 @@ class DetailsViewController: UIViewController {
                     image.image = UIImage(data: imgData as Data)
                 }
                 self.startEvent.text = self.decoder.timeConvert(sec: String((val["start_event"] as? Int)!))
+                self.starEvent = val["start_event"] as? Double
+                /*---------------------------------------*/
                 if val["stop_event"] as? String ?? "" != "" {
                     self.stopEvent.text = self.decoder.timeConvert(sec: String((val["stop_event"] as? Int)!))
                 }
-                self.seo = val["seo"] as? String ?? ""
-                self.getShotLink(URL: "")
-                
+                /*---------------------------------------*/
                 if self.targetName == "KudaGo" {
                     self.idPlace = val["place"] as? String ?? ""
-                    if self.idPlace != nil {
+                    if self.idPlace != nil && self.idPlace != "" {
                         refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
                             if snapshot.value as? NSDictionary == nil {
                                 self.manageKudaGO.loadPlaces(idPlace: self.idPlace)
                                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
+                            
                             if let snapPlace = snapshot.value as? NSDictionary {
                                 self.place.setTitle(snapPlace["title"] as? String ?? "", for: .normal)
+                                self.eventNotes = snapPlace["title"] as? String ?? ""
                                 self.placeName = snapPlace["title"] as? String ?? ""
                                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
                             }
                         })
+                    } else {
+                        self.place.setTitle(uds.value(forKey: "city") as! String, for: .normal)
                     }
-//                } else if self.targetName == "Ponaminalu" {
-//                    refPlace.child(self.checkPlace(name: val["place"] as? String ?? "")).observeSingleEvent(of: .value, with: { (snapshot) in
-//                        if snapshot.value as? NSDictionary == nil {
-//                            self.place.setTitle(val["place"] as? String ?? "", for: .normal)
-//                            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-//                        }
-//                        if let snapPlace = snapshot.value as? NSDictionary {
-//                            self.place.setTitle(snapPlace["title"] as? String ?? "", for: .normal)
-//                            self.placeName = snapPlace["title"] as? String ?? ""
-//                            UIApplication.shared.isNetworkActivityIndicatorVisible = false
-//                        }
-//                    })
+                    /*---------------------------------------*/
+                } else if self.targetName == "Ponaminalu" {
+                    self.seo = val["seo"] as? String ?? ""
+                    refPlace.observeSingleEvent(of: .value, with: { (snapshot) in
+                        for point in snapshot.children.allObjects as! [DataSnapshot] {
+                            if (point.childSnapshot(forPath: "title").value as! String).range(of: val["place"] as? String ?? "") != nil {
+                                self.place.setTitle(val["place"] as? String ?? "", for: .normal)
+                                self.idPlace = point.childSnapshot(forPath: "id").value as! String
+                                break
+                            }
+                        }
+                    })
+                    self.place.setTitle(val["place"] as? String ?? "", for: .normal)
+                    self.eventNotes = val["place"] as? String ?? ""
+                    /*---------------------------------------*/
+                } else if self.targetName == "TimePad" {
+                    self.idPlace = val["place"] as? String ?? ""
+                    if self.idPlace != nil && self.idPlace != "" {
+                        refPlace.child(self.idPlace).observeSingleEvent(of: .value, with: { (snapshot) in
+                            if snapshot.value as? NSDictionary != nil {
+                                if let snapPlace = snapshot.value as? NSDictionary {
+                                    self.place.setTitle(snapPlace["title"] as? String ?? "", for: .normal)
+                                    self.eventNotes = snapPlace["title"] as? String ?? ""
+                                    self.placeName = snapPlace["title"] as? String ?? ""
+                                    UIApplication.shared.isNetworkActivityIndicatorVisible = false
+                                }
+                            }
+                        })
                 } else {
+                    self.eventNotes = val["place"] as? String ?? ""
                     self.place.setTitle(val["place"] as? String ?? "", for: .normal)
                     self.placeName = val["place"] as? String ?? ""
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                 }
+                
+                /*---------------------------------------*/
+
                 if val["is_free"] as? String ?? "" == "false" {
-                    if val["price"] as? String ?? "" == "" {
+                    if val["price"] as? String ?? "" == "" || val["price"] as? String ?? "" == "0" {
                         self.cost.text = "Уточните цену в месте проведения."
                     } else {
                         self.cost.text = val["price"] as? String ?? ""
@@ -180,30 +232,23 @@ class DetailsViewController: UIViewController {
                 } else {
                     self.cost.text = "Бесплатно"
                 }
-            }
-        })
-    }
-    
-    func checkPlace() {
-        refPlace.observeSingleEvent(of: .value, with: {(snapshot) in
-            for id in snapshot.children.allObjects as! [DataSnapshot] {
-                if id.childSnapshot(forPath: "title").value as! String == "бар Strelka" {
-                    var result = id.childSnapshot(forPath: "id").value as! String
                 }
             }
         })
     }
     
     func loadDetailsSearchResultPonaminalu() {
-        Alamofire.request("https://api.cultserv.ru/v4/subevents/get/?session=\(apiKeyPonaminalu)&id=\(searchId)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488", method: .get).validate().responseJSON { response in
+        Alamofire.request("https://api.cultserv.ru/v4/subevents/get/?session=\(apiKeyPonaminalu)&id=\(self.searchId)&region_id=\(uds.value(forKey: "regionId") as! String)&promote=69399e321f034b29441a6a525c50a488", method: .get).validate().responseJSON { response in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
                 if json["code"].stringValue == "1" {
                     self.nameDetails.text = json["message"]["title"].stringValue
+                    self.eventName = json["message"]["title"].stringValue
                     self.fullDescription.text = Decoder().decodehtmltotxt(htmltxt: json["message"]["description"].stringValue)
                     self.cost.text = "от \(json["message"]["min_price"].stringValue) до \(json["message"]["max_price"].stringValue)"
                     self.startEvent.text = Decoder().dfPonam(date: json["message"]["date"].stringValue)
+                    self.starEvent = json["message"]["date"].doubleValue
                     self.stopEvent.text = "Уточняйте"
                     self.seo = json["message"]["event"]["seo"]["alias"].stringValue
                     let imgURL: NSURL = NSURL(string: "http://media.cultserv.ru/i/300x200/\(json["message"]["image"].stringValue)")!
@@ -247,9 +292,11 @@ class DetailsViewController: UIViewController {
                 let json = JSON(value)
                 self.getShotLink(URL: json["site_url"].stringValue)
                 self.nameDetails.text = json["title"].stringValue
+                self.eventName = json["title"].stringValue
                 self.fullDescription.text = json["body_text"].stringValue
                 self.cost.text = json["price"].stringValue
                 self.startEvent.text = Decoder().timeConvert(sec: json["dates"][0]["start"].stringValue)
+                self.starEvent = json["dates"][0]["start"].doubleValue
                 self.stopEvent.text = Decoder().timeConvert(sec: json["dates"][0]["end"].stringValue)
                 if json["images"][0]["image"].stringValue != "" {
                     let imgURL: NSURL = NSURL(string: json["images"][0]["image"].stringValue)!
@@ -289,6 +336,8 @@ class DetailsViewController: UIViewController {
             url = "https://ponominalu.ru/event/\(seo)?promote=eda0f065aec3fce22d0708362ca67e48"
         } else if targetName == "KudaGo" {
             url = URL
+        } else {
+            url = "http://ya.ru"
         }
         Alamofire.request("https://www.googleapis.com/urlshortener/v1/url?key=AIzaSyA9cmcL-eNsQSpKwN5xkAvlbb8-B9PIuyo", method: .post, parameters: ["longUrl":url], encoding: JSONEncoding.default).validate().responseJSON { response in
             
@@ -303,8 +352,8 @@ class DetailsViewController: UIViewController {
         }
     }
     
-    func showAlertPlace() {
-        let alert = UIAlertController(title: nil, message: "Я пока не знаю где находится это место, но я выясняю. Как будет известно, то ты узнаешь об этом первым", preferredStyle: .alert)
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "Ок", style: .default, handler: nil)
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
@@ -313,11 +362,12 @@ class DetailsViewController: UIViewController {
     //Идём смотреть инфу по месту проведения
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "place" {
-            if idPlace != nil {
+            if idPlace != nil && idPlace != "" {
                 let placeVC = segue.destination as! ShowPlaceViewController
                 placeVC.placeId = idPlace
+                placeVC.aggregator = targetName
             } else {
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "unknowplace"), object: nil)
+                showAlert(message: "Я пока не знаю где находится это место, но я выясняю. Как будет известно, то ты узнаешь об этом первым")
             }
         }
         if segue.identifier == "buyTicket" {
@@ -326,6 +376,4 @@ class DetailsViewController: UIViewController {
             buyVC.event = seo
         }
     }
-    
-
 }

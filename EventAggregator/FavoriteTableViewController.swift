@@ -19,14 +19,11 @@ class FavoriteTableViewController: UITableViewController {
     var favoriteId: [String] = []
     var favoriteTitle: [String] = []
     var favoriteDescription: [String] = []
-    var favoriteStart: [String] = []
-    var isFree: [String] = []
+    var favoriteStart: [Int] = []
+    var img: [NSData] = []
     var favoriteTarget: [String] = []
     
     @IBOutlet weak var menuButton: UIBarButtonItem!
-    @IBOutlet weak var favoriteName: UILabel!
-    @IBOutlet weak var favoriteDesc: UILabel!
-    @IBOutlet weak var favoriteST: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,7 +59,7 @@ class FavoriteTableViewController: UITableViewController {
         favoriteTitle = []
         favoriteDescription = []
         favoriteStart = []
-        isFree = []
+        img = []
         favoriteTarget = []
         let valueCityName = realm.objects(FavoriteEvent.self)
         for value in valueCityName {
@@ -71,8 +68,8 @@ class FavoriteTableViewController: UITableViewController {
                     self.favoriteTitle.append(val["short_title"] as? String ?? "")
                     self.favoriteId.append(val["id"] as? String ?? "")
                     self.favoriteDescription.append(val["description"] as? String ?? "")
-                    self.favoriteStart.append(val["start_event"] as? String ?? "")
-                    self.isFree.append(val["is_free"] as? String ?? "")
+                    self.favoriteStart.append((val["start_event"] as? Int)!)
+                    self.img.append(Utils().loadImage(url: val["image"] as? String ?? ""))
                     self.favoriteTarget.append(value.target)
                     self.tableView.reloadData()
                 }
@@ -99,17 +96,11 @@ class FavoriteTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let favoriteCell = tableView.dequeueReusableCell(withIdentifier: "favoriteCell", for: indexPath)
-
-        let labelName: UILabel = favoriteCell.viewWithTag(1) as! UILabel
-        labelName.text = self.favoriteTitle[indexPath.row]
-        
-        let labelDesc: UILabel = favoriteCell.viewWithTag(2) as! UILabel
-        labelDesc.text = self.favoriteDescription[indexPath.row]
-        
-        let labelStart: UILabel = favoriteCell.viewWithTag(3) as! UILabel
-        labelStart.text = self.favoriteStart[indexPath.row]
-
+        let favoriteCell = tableView.dequeueReusableCell(withIdentifier: "favoriteCell", for: indexPath) as! FavoriteCell
+        favoriteCell.favoriteName.text = self.favoriteTitle[indexPath.row]
+        favoriteCell.favoriteDesc.text = self.favoriteDescription[indexPath.row]
+        favoriteCell.favoriteST.text = Decoder().timeConvert(sec: String(self.favoriteStart[indexPath.row]))
+        favoriteCell.img.image = UIImage(data: img[indexPath.row] as Data)
         return favoriteCell
     }
     
@@ -119,12 +110,6 @@ class FavoriteTableViewController: UITableViewController {
                 realm.delete(realm.objects(FavoriteEvent.self).filter("id=%@",favoriteId[indexPath.row]))
             }
             favoriteId.remove(at: indexPath.item)
-//            favoriteTitle.remove(at: indexPath.item)
-//            favoriteId.remove(at: indexPath.item)
-//            favoriteDescription.remove(at: indexPath.item)
-//            favoriteStart.remove(at: indexPath.item)
-//            isFree.remove(at: indexPath.item)
-//            favoriteTarget.remove(at: indexPath.item)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
@@ -139,6 +124,11 @@ class FavoriteTableViewController: UITableViewController {
             }
         }
     }
- 
+}
 
+class FavoriteCell: UITableViewCell {
+    @IBOutlet weak var favoriteName: UILabel!
+    @IBOutlet weak var favoriteDesc: UILabel!
+    @IBOutlet weak var favoriteST: UILabel!
+    @IBOutlet weak var img: UIImageView!
 }

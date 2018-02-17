@@ -14,7 +14,7 @@ import FirebaseDatabase
 import Firebase
 
 
-class RootViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource {
+class RootViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegateFlowLayout {
 
     @IBOutlet weak var menuButton: UIBarButtonItem!
     @IBOutlet weak var showTop: UICollectionView!
@@ -67,11 +67,8 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let hotCell = collectionView.dequeueReusableCell(withReuseIdentifier: "hotCell", for: indexPath) as! HotCellCollectionViewControllerCell
         backQueue.async {
-            let imgURL: NSURL = NSURL(string: self.imgTopEvent[indexPath.row])!
-            let imgData: NSData = NSData(contentsOf: imgURL as URL)!
-            let image: UIImageView = hotCell.topEvent
             DispatchQueue.main.async {
-                image.image = UIImage(data: imgData as Data)
+                hotCell.topEvent.image = UIImage(data: self.utils.loadImage(url: self.imgTopEvent[indexPath.row]) as Data)
             }
             
         }
@@ -85,11 +82,16 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
         self.navigationController?.pushViewController(top, animated: true)
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        return CGSize(width: collectionView.bounds.width - 10, height: collectionView.bounds.height - 10)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
         var rowIndex = indexPath.row
         let numberOfRecords = self.imgTopEvent.count - 1
-        print(rowIndex, numberOfRecords)
+//        print(rowIndex, numberOfRecords)
         if rowIndex < numberOfRecords {
             rowIndex = rowIndex + 1
         } else {
@@ -101,9 +103,9 @@ class RootViewController: UIViewController, UICollectionViewDelegate, UICollecti
     }
     
     func startTimer(timer: Timer) {
-        UIView.animate(withDuration: 1.0, delay: 0, options: .curveEaseOut, animations: {
-            self.showTop.scrollToItem(at: IndexPath(row: timer.userInfo! as! Int, section: 0), at: .centeredHorizontally, animated: false)
-            }, completion: nil)
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseOut, animations: {
+            self.showTop.scrollToItem(at: IndexPath(row: timer.userInfo! as! Int, section: 0), at: .left, animated: false)
+        }, completion: nil)
     }
     
     /*-------------------------*COLLECTION VIEW*-------------------------*/

@@ -13,6 +13,7 @@ import FirebaseDatabase
 class LoadViewController: UIViewController {
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var stausLable: UILabel!
+    @IBOutlet weak var loadStage: UILabel!
     
     let manageTimepad: ManageEventTimepad = ManageEventTimepad()
     let manageKudaGo: ManageEventKudaGO = ManageEventKudaGO()
@@ -22,43 +23,35 @@ class LoadViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //прогресс загрузки
         Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(loadApplication), userInfo: nil, repeats: true)
         progressView.setProgress(0, animated: true)
         
         NotificationCenter.default.addObserver(self, selector: #selector(reloadKeyCity), name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(checkAggregator), name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(segue), name: NSNotification.Name(rawValue: "segue"), object: nil)
         
         //Очистака от старых эвентов и формарование массива актуальных мероприятий
         if uds.value(forKey: "city") != nil {
+            nameLoadStage = "Удаление прошедших мероприятий"
             userQueue.async {self.utils.removeEvent()} // чистит старое
         }
         /*-------------**************ПЕРВАЯ ЗАГРУЗКА**************-------------*/
         //При первой загрузке задаётся город
         if uds.value(forKey: "city") == nil {
-            uds.set("Москва", forKey: "city")
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
-        }
-        //создаём отметку первого запуска чтобы вести отчёт когда почистить события
-        if uds.value(forKey: "lastLoad") == nil {
             uds.set(true, forKey: "switchKudaGO")
             uds.set(true, forKey: "switchPonaminalu")
-            uds.set(0, forKey: "lastLoad")
-            
+            uds.set(true, forKey: "switchTimaPad")
+            uds.set("Москва", forKey: "city")
+            utils.lastLoad()
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "reloadKeyCity"), object: nil)
         } else {
+            utils.lastLoad()
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "checkAggregator"), object: nil)
         }
         /*-------------**************ПЕРВАЯ ЗАГРУЗКА**************-------------*/
 
-        
-        // Do any additional setup after loading the view.
         updateTop()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        print("any")
-        // Dispose of any resources that can be recreated.
     }
     
     func loadApplication() {
@@ -66,10 +59,10 @@ class LoadViewController: UIViewController {
             if statusLoad == 0 {
                 statusLoad = (1 - statusLoad) / Float(countLoad)
             }
+            self.loadStage.text = nameLoadStage
             self.progressView.progress = persentLoad
         }
         else {
-//            stausLable.text = "Загрузка завершена".default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
             performSegue(withIdentifier: "startApp", sender: self)
         }
     }
@@ -85,9 +78,9 @@ class LoadViewController: UIViewController {
                 managePonaminalu.loadEventPonaminalu()
             }
             if uds.bool(forKey: "switchTimaPad") == true {
-                print("TimePad is ON")
+                ManageEventTimepad().loadTimePadEvent()
             }
-            uds.set(Int(NSDate().timeIntervalSince1970), forKey: "lastLoad")
+            refEvent.child("\(uds.value(forKey: "city") as! String)/lastLoad").setValue(Int(NSDate().timeIntervalSince1970))
         }
     }
     
@@ -98,19 +91,16 @@ class LoadViewController: UIViewController {
                 if uds.value(forKey: "city") as! String == tmpName["Name"] as? String ?? "" {
                     if tmpName["Slug"] as? String ?? "" != "" {
                         uds.set(tmpName["Slug"] as? String ?? "", forKey: "citySlug")
+                        uds.set(true, forKey: "switchKudaGO")
                     } else {
                         uds.set("", forKey: "citySlug")
+                        uds.set(false, forKey: "switchKudaGO")
                     }
                     if tmpName["Region_id"] as? String ?? "" != "" {
                         uds.set(tmpName["Region_id"] as? String ?? "", forKey: "regionId")
+                        uds.set(true, forKey: "switchPonaminalu")
                     } else {
                         uds.set("", forKey: "regionId")
-                    }
-                    
-                    if uds.value(forKey: "citySlug") as! String == "" {
-                        uds.set(false, forKey: "switchKudaGO")
-                    }
-                    if uds.value(forKey: "regionId") as! String == "" {
                         uds.set(false, forKey: "switchPonaminalu")
                     }
                     if uds.value(forKey: "regionId") as! String != "" || uds.value(forKey: "citySlug") as! String != "" {
@@ -123,6 +113,7 @@ class LoadViewController: UIViewController {
     }
     
     func updateTop() {
+        nameLoadStage = "Обновляем рекомендации для Вас"
         countLoad += 1
         DispatchQueue.main.async { [unowned self] in
             ref.child("Update").observeSingleEvent(of: .value, with: {(snapshot) in
@@ -140,8 +131,6 @@ class LoadViewController: UIViewController {
                                     })
                                 }
                             })
-                        } else {
-//                            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "segue"), object: nil)
                         }
                         if index + 1 == update.count {
                             persentLoad += statusLoad
@@ -150,9 +139,5 @@ class LoadViewController: UIViewController {
                 }
             })
         }
-    }
-    
-    func segue() {
-        performSegue(withIdentifier: "startApp", sender: self)
     }
 }

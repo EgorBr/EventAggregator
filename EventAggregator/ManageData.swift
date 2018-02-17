@@ -33,7 +33,7 @@ class ManageData {
                         image: String,
                         age_restriction: String) {
         
-        let reference = refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(agregator)")
+        let reference = refEvent.child("\(uds.value(forKey: "city") as! String)/Events/")
         
         reference.child("\(key)/id").setValue(key)
         reference.child("\(key)/title").setValue(title)
@@ -44,33 +44,34 @@ class ManageData {
         reference.child("\(key)/place").setValue(place)
         reference.child("\(key)/categories").setValue(categories)
         reference.child("\(key)/price").setValue("от \(min_price) до \(max_price)")
-        reference.child("\(key)/target").setValue(agregator)
+        reference.child("\(key)/min").setValue(Int(min_price))
+//        reference.child("\(key)/target").setValue(agregator)
 
-        if agregator == "KudaGo" {
+        if key.characters.last! == "K"{
             reference.child("\(key)/age_restriction").setValue(age_restriction)
         }
-        
-        if agregator == "Ponaminalu" {
-            reference.child("\(key)/start_event").setValue(self.decoder.timeConvertToSec(startTime: start_event))
+
+        if key.characters.last! == "P" {
+            reference.child("\(key)/start_event").setValue(self.decoder.timeConvertToSec(startTime: start_event, from: "Ponaminalu"))
         } else {
             reference.child("\(key)/start_event").setValue(start_event)
             reference.child("\(key)/stop_event").setValue(stop_event)
         }
         
-        if agregator == "Ponaminalu" {
+        if key.characters.last! == "P" {
             reference.child("\(key)/seo").setValue(seo)
         }
         
-        if agregator == "Ponaminalu" {
+        if key.characters.last! == "P" {
             reference.child("\(key)/image").setValue("http://media.cultserv.ru/i/300x200/\(image)")
         } else {
             reference.child("\(key)/image").setValue(image)
         }
         
-        if agregator == "Ponaminalu" {
+        if key.characters.last! == "P" {
             reference.child("\(key)/eticket_possible").setValue(eticket_possible)
         }
-        if agregator == "KudaGo" {
+        if key.characters.last! == "K" {
             reference.child("\(key)/body_text").setValue(self.decoder.decodehtmltotxt(htmltxt: body_text))
         } 
     }

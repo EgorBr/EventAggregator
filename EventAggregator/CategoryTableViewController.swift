@@ -12,7 +12,6 @@ import Firebase
 class CategoryTableViewControllerCell: UITableViewCell {
     @IBOutlet weak var eventNameLabel: UILabel!
     @IBOutlet weak var countLabel: UILabel!
-
 }
 
 
@@ -26,7 +25,6 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
         view.backgroundColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 1)
         self.navigationController?.view.addSubview(view)
@@ -35,20 +33,24 @@ class CategoryTableViewController: UITableViewController {
             if let keyValue = snapshot.value as? NSDictionary {
                 for getKey in keyValue.allKeys {
                     refCategory.child(getKey as! String).observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let snap = snapshot.value as? NSDictionary {
-//                            self.name.append(snap["name"] as? String ?? "")
-                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/Ponaminalu").observeSingleEvent(of: .value, with: { (snapshot) in
-                                for val in snapshot.children.allObjects as! [DataSnapshot] {
-                                    if snap["slug"] as? String ?? "" == val.childSnapshot(forPath: "categories").value as! String {
-                                        if self.slug.contains(snap["slug"] as? String ?? "") == false {
-                                            self.slug.append(snap["slug"] as? String ?? "")
-                                        }
-                                    }
-                                    
-//                                    self.tableView.reloadData()
-                                }
-                                self.categories[snap["slug"] as? String ?? ""] = String(self.slug.count)
-                            })
+                        if let items = snapshot.value as? NSDictionary {
+//                            print(items["slug"] as? String ?? "")
+                            self.name.append(items["name"] as? String ?? "")
+                            self.slug.append(items["slug"] as? String ?? "")
+                            
+//                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/Ponaminalu").observeSingleEvent(of: .value, with: { (snapshot) in
+//                                for val in snapshot.children.allObjects as! [DataSnapshot] {
+//                                    if snap["slug"] as? String ?? "" == val.childSnapshot(forPath: "categories").value as! String {
+//                                        if self.slug.contains(snap["slug"] as? String ?? "") == false {
+//                                            self.slug.append(snap["slug"] as? String ?? "")
+//                                            print(self.slug)
+//                                            print(self.name)
+//                                        }
+//                                    }
+//                                    
+//                                }
+//                                self.categories[snap["slug"] as? String ?? ""] = String(self.slug.count)
+//                            })
 //                            self.count.append(snap["events_count"] as? String ?? "")
 //                            self.tableView.reloadData()
                         }
@@ -60,71 +62,17 @@ class CategoryTableViewController: UITableViewController {
         
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    // MARK: - Table view data source
-
-//    override func numberOfSections(in tableView: UITableView) -> Int {
-//        // #warning Incomplete implementation, return the number of sections
-//        return 1
-//    }
-
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return categories.count
+        return name.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let categoryCell = tableView.dequeueReusableCell(withIdentifier: "category", for: indexPath) as! CategoryTableViewControllerCell
-//        let slug = self.slug[indexPath.row]
-//        print(slug)
-//        categoryCell.eventNameLabel.text = categories[slug]
-//        if self.count[indexPath.row] == "" {
-//            categoryCell.countLabel.text = "-"
-//        } else {
-//            categoryCell.countLabel.text = self.count[indexPath.row]
-//        }
+        categoryCell.eventNameLabel.text = name[indexPath.row]
+        categoryCell.countLabel.isHidden = true
+//        categoryCell.countLabel.text =  "Скоро"
         return categoryCell
     }
-    
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "setCategory" {

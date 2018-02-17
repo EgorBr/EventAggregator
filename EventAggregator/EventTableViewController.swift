@@ -28,6 +28,11 @@ class EventTableViewController: UITableViewController {
     var category: String!
     var categoryName: String!
     
+    var date: String!
+    var cost: String!
+    var filterSort: Int!
+    
+    
     private var refresher: UIRefreshControl!
     let utils: Utils = Utils()
     let decoder: Decoder = Decoder()
@@ -37,7 +42,7 @@ class EventTableViewController: UITableViewController {
         super.viewDidLoad()
         // обновление списка мерприятий свайпом вниз
         refresher = UIRefreshControl()
-        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refresher.attributedTitle = NSAttributedString(string: "Сбросил все фильтры. Подождите ... ")
         refresher.addTarget(self, action: #selector(EventTableViewController.refreshLoad), for: .valueChanged)
         tableView.addSubview(refresher)
         
@@ -57,12 +62,12 @@ class EventTableViewController: UITableViewController {
         
         if category == nil {
             self.navigationItem.title = uds.value(forKey: "city") as! String
+            loadListEvent()
         } else {
-            self.navigationItem.title = "\(uds.value(forKey: "city") as! String). \(category)"
+            self.navigationItem.title = "\(uds.value(forKey: "city") as! String). \(category!)"
+            resetVariables()
+            loadCategoryEvent()
         }
-
-        loadListEvent()
-
     }
 
     
@@ -94,53 +99,91 @@ class EventTableViewController: UITableViewController {
     func refreshLoad() {
         source = []
         self.tableView.reloadData()
-        for aggregator in aggrs {
-            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
-                if snapshot.childrenCount > 0 {
-                    let first = snapshot.children.allObjects.last as! DataSnapshot
-                    for s in snapshot.children.allObjects as! [DataSnapshot]{
-                        let item = s.value as! Dictionary<String,AnyObject?>
-                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
-                        self.source.append(variables)
-                    }
-                    self.currentKey = first.key
-                    self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
-                    self.refresher.endRefreshing()
-                    self.tableView.reloadData()
-                    
+        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+            if snapshot.childrenCount > 0 {
+                let first = snapshot.children.allObjects.last as! DataSnapshot
+                for s in snapshot.children.allObjects as! [DataSnapshot]{
+                    let item = s.value as! Dictionary<String,AnyObject?>
+                    let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                    self.source.append(variables)
                 }
-            })
-        }
+                self.currentKey = first.key
+                self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
+                self.refresher.endRefreshing()
+                self.tableView.reloadData()
+                
+            }
+        })
+        
     }
 
     func loadListEvent() {
-        for aggregator in aggrs {
             if currentKey == nil {
                 utils.showActivityIndicator(uiView: self.view)
-                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryOrdered(byChild: "start_event").queryLimited(toFirst: 20).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
                     if snapshot.childrenCount > 0 {
                         let first = snapshot.children.allObjects.last as! DataSnapshot
                         for s in snapshot.children.allObjects as! [DataSnapshot]{
                             let item = s.value as! Dictionary<String,AnyObject?>
                             let variables = Variables(dict: item as Dictionary<String,AnyObject>)
-                            self.source.append(variables)
+                            if uds.bool(forKey: "switchKudaGO") == true {
+                                if variables._id.characters.last! == "K" {
+                                    self.source.append(variables)
+                                }
+                            }
+                            if uds.bool(forKey: "switchPonaminalu") == true {
+                                if variables._id.characters.last! == "P" {
+                                    self.source.append(variables)
+                                }
+                            }
+                            if uds.bool(forKey: "switchTimaPad") == true {
+                                if variables._id.characters.last! == "T" {
+                                    self.source.append(variables)
+                                }
+                            }
                         }
                         self.currentKey = first.key
                         self.currentScore = first.childSnapshot(forPath: "start_event").value as! Int
                         self.tableView.reloadData()
                         self.utils.hideActivityIndicator(uiView: self.view)
+                    } else {
+                        self.utils.hideActivityIndicator(uiView: self.view)
+                        self.showAlert(message: "Ничего нет, но сейчас все загрузим")
+                        if uds.bool(forKey: "switchKudaGO") == true {
+                            ManageEventKudaGO().loadEventKudaGO()
+                        }
+                        if uds.bool(forKey: "switchPonaminalu") == true {
+                            ManagePonaminaluEvent().loadEventPonaminalu()
+                        }
+                        if uds.bool(forKey: "switchTimaPad") == true {
+                            ManageEventTimepad().loadTimePadEvent()
+                        }
+                        refEvent.child("\(uds.value(forKey: "city") as! String)/lastLoad").setValue(Int(NSDate().timeIntervalSince1970))
                     }
                 })
             } else {
-                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(aggregator)").queryStarting(atValue: self.currentScore).queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryStarting(atValue: self.currentScore).queryOrdered(byChild: "start_event").queryLimited(toFirst:20).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
                     if snapshot.childrenCount > 0 {
                         let first = snapshot.children.allObjects.last as! DataSnapshot
                         for s in snapshot.children.allObjects as! [DataSnapshot]{
                             if s.key != self.currentKey {
                                 let item = s.value as! Dictionary<String,AnyObject?>
                                 let variables = Variables(dict: item as Dictionary<String,AnyObject>)
-                                self.source.append(variables)
-//                                self.source.insert(variables, at: self.source.count)
+                                if uds.bool(forKey: "switchKudaGO") == true {
+                                    if variables._id.characters.last! == "K" {
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if uds.bool(forKey: "switchPonaminalu") == true {
+                                    if variables._id.characters.last! == "P" {
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if uds.bool(forKey: "switchTimaPad") == true {
+                                    if variables._id.characters.last! == "T" {
+                                        self.source.append(variables)
+                                    }
+                                }
                             }
                         }
                         self.currentKey = first.key
@@ -151,7 +194,154 @@ class EventTableViewController: UITableViewController {
                     self.tableView.tableFooterView = nil
                 })
             }
+    }
+    
+    
+    func loadFilteredListEvent(cost: String, date: Int) {
+            if currentKey == nil {
+                utils.showActivityIndicator(uiView: self.view)
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryOrdered(byChild: "start_event").observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                    if snapshot.childrenCount > 0 {
+                        for s in snapshot.children.allObjects as! [DataSnapshot] {
+                            if self.source.count < (UInt(18 / self.aggrs.count)) {
+                                if Int(cost)! != 0 && date == 0 {
+                                    if (s.childSnapshot(forPath: "min").value as! Int) < Int(cost)! {
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if date != 0 && Int(cost)! == 0 {
+                                    if (s.childSnapshot(forPath: "start_event").value as! Int) <= date {
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if date != 0 && Int(cost)! != 0 {
+                                    print(s.childSnapshot(forPath: "start_event").value as! Int)
+                                    print(date)
+                                    print(s.childSnapshot(forPath: "min").value as! Int)
+                                    print(cost)
+                                    if (s.childSnapshot(forPath: "start_event").value as! Int) <= date && (s.childSnapshot(forPath: "min").value as! Int) <= Int(cost)! {
+                                        print("WTF!?")
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                            } else {
+                                break
+                            }
+                        }
+                        self.currentKey = self.source.last?._id
+                        self.currentScore = self.decoder.dfTP(time: (self.source.last?._startEventTime)!)
+                        self.tableView.reloadData()
+                        self.utils.hideActivityIndicator(uiView: self.view)
+                    }
+                })
+            } else {
+                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryStarting(atValue: self.currentScore).queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                    if snapshot.childrenCount > 0 {
+                        let last = snapshot.children.allObjects.last as! DataSnapshot
+                        for s in snapshot.children.allObjects as! [DataSnapshot]{
+                            if s.key != self.currentKey {
+                                if Int(cost)! != 0 && date == 0 {
+                                    if (s.childSnapshot(forPath: "min").value as! Int) < Int(cost)! {
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if date != 0 && Int(cost)! == 0 {
+                                    if (s.childSnapshot(forPath: "start_event").value as! Int) <= date {
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                                if date != 0 && Int(cost)! != 0 {
+                                    if (s.childSnapshot(forPath: "start_event").value as! Int) <= date && (s.childSnapshot(forPath: "min").value as! Int) < Int(cost)! {
+                                        let item = s.value as! Dictionary<String,AnyObject?>
+                                        let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                        self.source.append(variables)
+                                    }
+                                }
+                            }
+                        }
+                        self.currentKey = last.key
+                        self.currentScore = last.childSnapshot(forPath: "start_event").value as! Int
+                        self.tableView.reloadData()
+                    }
+                    self.spinner.stopAnimating()
+                    self.tableView.tableFooterView = nil
+                })
+            }
+        
+    }
+    
+    func loadCategoryEvent() {
+        if currentKey == nil {
+            utils.showActivityIndicator(uiView: self.view)
+            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryOrdered(byChild: "start_event").observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                if snapshot.childrenCount > 0 {
+                    for s in snapshot.children.allObjects as! [DataSnapshot] {
+                        if self.source.count < (UInt(18 / self.aggrs.count)) {
+                            if s.childSnapshot(forPath: "categories").value as! String == self.categoryName {
+                                let item = s.value as! Dictionary<String,AnyObject?>
+                                let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                self.source.append(variables)
+                            }
+                        } else {
+                            break
+                        }
+                    }
+                    if self.source.count > 0 {
+                        self.currentKey = self.source.last?._id
+                        self.currentScore = self.decoder.dfTP(time: (self.source.last?._startEventTime)!)
+                        self.utils.hideActivityIndicator(uiView: self.view)
+                        self.tableView.reloadData()
+                    } else {
+                        self.utils.hideActivityIndicator(uiView: self.view)
+                        self.showAlertPlace()
+                    }
+                }
+            })
+        } else {
+            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").queryStarting(atValue: self.currentScore).queryOrdered(byChild: "start_event").queryLimited(toFirst: (UInt(18 / aggrs.count))).observeSingleEvent(of: .value, with: { (snapshot:DataSnapshot) in
+                if snapshot.childrenCount > 0 {
+                    let last = snapshot.children.allObjects.last as! DataSnapshot
+                    for s in snapshot.children.allObjects as! [DataSnapshot]{
+                        if s.key != self.currentKey {
+                            if s.childSnapshot(forPath: "categories").value as! String == self.categoryName {
+                                let item = s.value as! Dictionary<String,AnyObject?>
+                                let variables = Variables(dict: item as Dictionary<String,AnyObject>)
+                                self.source.append(variables)
+                            }
+                        }
+                    }
+                    self.currentKey = last.key
+                    self.currentScore = last.childSnapshot(forPath: "start_event").value as! Int
+                    self.tableView.reloadData()
+                }
+                self.spinner.stopAnimating()
+                self.tableView.tableFooterView = nil
+            })
         }
+    }
+    
+    func resetVariables() {
+        source = []
+        currentScore = nil
+        currentKey = nil
+        self.tableView.reloadData()
+    }
+    
+    func showAlertPlace() {
+        let alert = UIAlertController(title: nil, message: "Прости, но ничего нет. Давай посмотрим что-нибудь ещё!?", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -180,9 +370,20 @@ class EventTableViewController: UITableViewController {
         if maxOffset - currentOffset <= 44 && self.source.count != 0 {
             spinner.startAnimating()
             spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width * 2, height: CGFloat(44))
-            tableView.tableFooterView = spinner
+            tableView.tableFooterView = self.spinner
             tableView.tableFooterView?.isHidden = false
-            self.loadListEvent()
+            if cost != nil {
+                self.loadFilteredListEvent(cost: cost, date: 0)
+            } else if date != nil {
+                self.loadFilteredListEvent(cost: String(0), date: self.decoder.timeConvertToSec(startTime: date, from: "filter"))
+            } else if date != nil && cost != nil {
+                self.loadFilteredListEvent(cost: cost, date: self.decoder.timeConvertToSec(startTime: date, from: "filter"))
+            } else if categoryName != nil {
+                self.loadCategoryEvent()
+            } else {
+                self.loadListEvent()
+            }
+            
         }
     }
     
@@ -191,9 +392,58 @@ class EventTableViewController: UITableViewController {
             if let indexPath = tableView.indexPathForSelectedRow {
                 let destinationVC = segue.destination as! DetailsViewController
                 destinationVC.idEvent = self.source[indexPath.row]._id
-                destinationVC.targetName = self.source[indexPath.row]._target
+                if self.source[indexPath.row]._id.characters.last! == "K" {
+                    destinationVC.targetName = "KudaGo"
+                } else if self.source[indexPath.row]._id.characters.last! == "P" {
+                    destinationVC.targetName = "Ponaminalu"
+                } else {
+                    destinationVC.targetName = "TimePad"
+                }
             }
         }
+        if segue.identifier == "setFilter" {
+            let destinationVC = segue.destination as! SetFilterViewController
+            if cost != nil {
+                destinationVC.switchStatus = true
+                destinationVC.cost = cost
+            }
+            if date != nil {
+                destinationVC.date = date
+            }
+        }
+    }
+    
+    @IBAction func unwindApplyFilter(_ sender: UIStoryboardSegue) {
+        guard let filterVC = sender.source as? SetFilterViewController else { return }
+        if filterVC.dateField.text! != "" && filterVC.maxCost.text! == "" {
+            date = filterVC.dateField.text
+            cost = nil
+            if date != nil {
+                resetVariables()
+                loadFilteredListEvent(cost: String(0), date: self.decoder.timeConvertToSec(startTime: date, from: "filter"))
+            }
+        } else if filterVC.maxCost.text! != "" && filterVC.dateField.text! == "" {
+            cost = filterVC.maxCost.text
+            date = nil
+            if cost != nil {
+                resetVariables()
+                loadFilteredListEvent(cost: cost, date: 0)
+            }
+        } else if filterVC.maxCost.text! != "" && filterVC.dateField.text! != "" {
+            date = filterVC.dateField.text
+            cost = filterVC.maxCost.text
+            if cost != nil && date != nil {
+                resetVariables()
+                loadFilteredListEvent(cost: cost, date: self.decoder.timeConvertToSec(startTime: date, from: "filter"))
+            }
+        }
+    }
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+        
     }
  }
 

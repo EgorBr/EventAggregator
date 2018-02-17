@@ -48,6 +48,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Я хочу добавить тебе мероприятие в календарь</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Нам нужно знать где Вы, чтобы подсказать где ближайшее мероприятие</string>
 	<key>UILaunchStoryboardName</key>

@@ -19,6 +19,7 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
 
     @IBOutlet weak var locationView: MKMapView!
     @IBOutlet weak var locMenuButton: UIBarButtonItem!
+    @IBOutlet weak var temp: UIBarButtonItem!
     @IBAction func locationMeButton(_ sender: Any) {
         location.startUpdatingLocation() // запускает метод locationManager()
 //      locationView.setCenter(locationView.userLocation.coordinate, animated: true) //Независимо от масштаба ставит тебя в центр экрана
@@ -26,6 +27,7 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        temp.title = "-12 C"
         let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 20.0))
         view.backgroundColor = UIColor(red: 42/255, green: 26/255, blue: 25/255, alpha: 0.65)
         self.navigationController?.view.addSubview(view)
@@ -48,7 +50,7 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
             for item in snapshot.children {
                 if String(describing: (item as AnyObject).childSnapshot(forPath: "location").value!) != "<null>" {
                 let namePlace = (item as AnyObject).childSnapshot(forPath: "title").value as! String
-                    if uds.value(forKey: "citySlug") as! String == (item as AnyObject).childSnapshot(forPath: "location").value as! String  {
+                    if uds.value(forKey: "citySlug") as! String == (item as AnyObject).childSnapshot(forPath: "location").value as! String || ((item as AnyObject).childSnapshot(forPath: "id").value as! String).characters.last! == "T"  {
                         refPlace.child("\((item as AnyObject).childSnapshot(forPath: "id").value as! String)/coords").observeSingleEvent(of: .value, with: {(snapshot) in
                             if let coords = snapshot.value as? NSDictionary {
                                 //ставим булавку в указанном месте
@@ -62,7 +64,6 @@ class EventMapLocationViewController: UIViewController, CLLocationManagerDelegat
                 }
             }
         })
-        // Do any additional setup after loading the view.
     }
     
     override func didReceiveMemoryWarning() {

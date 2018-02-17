@@ -98,19 +98,19 @@ class SelectCityTableViewController: UITableViewController, UISearchResultsUpdat
         return cell
     }
     //с условием для searchController
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "select" {
-            if let indexPath = tableView.indexPathForSelectedRow {
-                if searchController.isActive {
-                    let destinationVC = segue.destination as! SettingsTableViewController
-                    destinationVC.selectCity = filteredCity.sorted(by: < )[indexPath.row]
-                    searchController.isActive = false
-                } else {
-                    let destinationVC = segue.destination as! SettingsTableViewController
-                    destinationVC.selectCity = sortCity[indexPath.row]
-                    searchController.isActive = false
-                }
-            }
-        }
-    }
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "select" {
+//            if let indexPath = tableView.indexPathForSelectedRow {
+//                if searchController.isActive {
+//                    let destinationVC = segue.destination as! SettingsTableViewController
+//                    destinationVC.selectCity = filteredCity.sorted(by: < )[indexPath.row]
+//                    searchController.isActive = false
+//                } else {
+//                    let destinationVC = segue.destination as! SettingsTableViewController
+//                    destinationVC.selectCity = sortCity[indexPath.row]
+//                    searchController.isActive = false
+//                }
+//            }
+//        }
+//    }
 }

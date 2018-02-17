@@ -15,7 +15,6 @@ let userQueue = DispatchQueue(label: "ru.EventEggragator.userInitiated")
 let backQueue = DispatchQueue(label: "ru.EventEggragator.background", qos: .background)
 let concurrentQueue = DispatchQueue(label: "concurrent_queue", attributes: .concurrent)
 let updateTopGroup = DispatchGroup()
-let semafore = DispatchSemaphore(value: 0)
 let ref = Database.database().reference()
 let refEvent = Database.database().reference().child("Event")
 let refPlace = Database.database().reference().child("Place")
@@ -27,6 +26,7 @@ let apiKeyPonaminalu: String = "eventapi98471241"
 var statusLoad:Float = 0
 var persentLoad: Float = 0
 var countLoad: Int = 0
+var nameLoadStage: String!
 
 var idCellNews: [String] = []
 var titleCellNews: [String] = []
@@ -46,29 +46,22 @@ class Utils {
 
     func removeEvent() {
         countLoad += 1
-        refEvent.child("\(uds.value(forKey: "city") as! String)/Events").observeSingleEvent(of: .value, with: { (snapshot) in
-            if let keyValue = snapshot.value as? NSDictionary {
+        refEvent.child("\(uds.value(forKey: "city") as! String)/Events/").observeSingleEvent(of: .value, with: { (snapshot) in
+            if let ev = snapshot.value as? NSDictionary {
                 persentLoad += statusLoad
-                for nameAggr in keyValue.allKeys {
-                    refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)").observeSingleEvent(of: .value, with: { (snapshot) in
-                        if let ev = snapshot.value as? NSDictionary {
-                            for remove in ev.allKeys {
-                                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)").observeSingleEvent(of: .value, with: { (snapshot) in
-                                    if let checkValidate = snapshot.value as? NSDictionary {
-                                        let time: Int = checkValidate["start_event"]! as! Int
-                                        if Int(NSDate().timeIntervalSince1970) - time > 10000 {
-                                            print("REMOVE \(time) \(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)")
-                                            refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(nameAggr)/\(remove)").removeValue()
-                                        }
-                                    }
-                                })
+                for remove in ev.allKeys {
+                    refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(remove)").observeSingleEvent(of: .value, with: { (snapshot) in
+                        if let checkValidate = snapshot.value as? NSDictionary {
+                            let time = checkValidate["start_event"]! as! Double
+                            if NSDate().timeIntervalSince1970 - time > 10000 {
+                                print("REMOVE \(time) \(uds.value(forKey: "city") as! String)/Events/\(remove)")
+                                refEvent.child("\(uds.value(forKey: "city") as! String)/Events/\(remove)").removeValue()
                             }
                         }
                     })
                 }
             }
         })
-        
     }
     
     func loadHotEvent(topId: String, itemNum: Int) {
@@ -145,4 +138,11 @@ class Utils {
         return UIColor(red:red, green:green, blue:blue, alpha:CGFloat(alpha))
     }
     
+    func lastLoad () {
+        refEvent.child("\(uds.value(forKey: "city") as! String)").observeSingleEvent(of: .value, with: { (snapshot) in
+            if let lastLoad = snapshot.value as? NSDictionary {
+                uds.set(lastLoad["lastLoad"]! as! Double, forKey: "lastLoad")
+            }
+        })
+    }
 }
